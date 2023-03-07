@@ -1,0 +1,1 @@
+"Q1"," Select (count(?cf) as ?count) WHERE { ?cf a ecfo:EmissionConversionFactor. }"
