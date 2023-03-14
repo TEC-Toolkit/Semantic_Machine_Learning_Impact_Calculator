@@ -1,0 +1,50 @@
+.about-section {
+    background: linear-gradient(to bottom, $back-25 0, $back-1 75%, $back-15 100%), url("https://storage.needpix.com/rsynced_images/sunset-sky-1455125487HWs.jpg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: scroll;
+    background-size: cover;
+    padding: $sectionPaddingTop 0;
+
+    @media(max-width: 768px) {
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+    }
+
+    .about-content-row {
+
+        margin-top: 3rem;
+
+        .about-content-img {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            a{
+                text-align: center;
+            }
+
+            img {
+                background-color: white;
+                transition: all 250ms ease;
+                max-width: 90%;
+                border-radius: 4px;
+                box-shadow: $cardboxshadow;
+                @media(min-width: 768px) {
+                    &:hover {
+                        transform: scale(1.05)
+                    }
+                }
+            }
+        }
+
+        .about-content-text {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+    }
+
+
+}

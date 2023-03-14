@@ -1,0 +1,54 @@
+.authors-section {
+    background: linear-gradient(to bottom, $back-15 0, $back-2 75%, $back-25 100%), url("https://raw.githubusercontent.com/mlco2/impact/master/img/mountains.jpeg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: scroll;
+    background-size: cover;
+    padding: $sectionPaddingTop 0;
+
+    min-height: 100vh;
+
+    @media(max-width: 768px) {
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+    }
+
+    .authors-content-row {
+
+        margin-top: 3rem;
+
+        .authors-content-img {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            a {
+                text-align: center;
+            }
+
+            img {
+                background-color: white;
+                transition: all 250ms ease;
+                max-width: 200px;
+                border-radius: 4px;
+                box-shadow: $cardboxshadow;
+
+                @media(min-width: 768px) {
+                    &:hover {
+                        transform: scale(1.05)
+                    }
+
+                    max-width: 90%;
+                }
+            }
+        }
+
+        .authors-content-text {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+    }
+
+}

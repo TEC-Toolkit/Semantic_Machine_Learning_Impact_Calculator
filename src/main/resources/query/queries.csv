@@ -1,1 +1,1 @@
-"Q1"," Select (count(?cf) as ?count) WHERE { ?cf a ecfo:EmissionConversionFactor. }"
+"Q1"," Select distinct ?id ?sourceUnit ?applicableLocation ?targetUnit ?source ?value WHERE { ?id a ecfo:EmissionConversionFactor. OPTIONAL {?id ecfo:sourceUnit ?sourceUnit.} OPTIONAL {?id ecfo:targetUnit ?targetUnit.} OPTIONAL {?id prov:wasDerivedFrom ?source.} OPTIONAL {?id rdf:value ?value.}}"

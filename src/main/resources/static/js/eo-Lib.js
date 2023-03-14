@@ -1,0 +1,160 @@
+
+
+var  dataPrefix =  "https://eats.org/InstanceData/";
+var  eoPrefix =  "https://w3id.org/okn/o/eo#";
+
+/**
+ * from stack overflow https://stackoverflow.com/questions/105034/how-to-create-guid-uuid
+ * @returns unique uuid
+ */
+  function uuidv4() {
+  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
+  }
+
+  function simplifyGraph (garaphObj) {
+  	
+	  let newGraph = {};
+	  
+	  
+	  
+	  return newGraph;
+  }
+
+
+function generateJsonLDstring (graphLD) {
+	
+	let jsonld = {};
+	jsonld ['@context'] = context;
+	jsonld ['@graph'] = graphLD;
+	
+	return JSON.stringify(jsonld); 
+}
+
+function generateJsonObject (graphLD) {
+	
+	let jsonld = {};
+	jsonld ['@context'] = context;
+	jsonld ['@graph'] = graphLD;
+	
+	return jsonld; 
+}
+
+function createConversionFactor (label, value,sourceUnitIRI,targetUnitIRI, scope, publisher, validFrom, validTo, applicableLocation, graphLD,source) {
+	let IRI = dataPrefix + uuidv4();
+	let cf = {}; 
+	
+	cf ['@id'] = IRI;
+	cf ['@type'] = [];
+	cf ['@type'].push (context.namedIndividual);
+	cf ['@type'].push (context.Cf);
+	cf ['label']= label;
+	
+	cf ['rdf_value']= value;
+	
+	cf ['publisher']= publisher;
+	cf ['validUntil']= validTo;
+	cf ['validFrom']= validFrom;
+	cf ['sourceUnit']= sourceUnitIRI;
+	cf ['targetUnit']= targetUnitIRI;
+	cf ['scope']= scope;
+	cf ['applicableLocation']= applicableLocation;
+	
+	
+	graphLD.push(cf);
+	
+	return IRI;
+}
+
+function createCalculationEntity (label, value,unitIRI,quantityKindIRI, graphLD,source) {
+	
+	let IRI = dataPrefix + uuidv4();
+	let input = {}; 
+	
+	input ['@id'] = IRI;
+	input ['@type'] = [];
+	input ['@type'].push (context.namedIndividual);
+	input ['@type'].push (context.EmissionCalculationEntity);
+	input ['@type'].push (context.Quantity);
+	input ['label']= label;
+	input ['qudt_value']= value;
+	
+	let unit = {}; 
+	unit ['@id'] = unitIRI;
+	unit ['@type'] = [];
+	unit ['@type'].push (context.namedIndividual);
+	unit ['@type'].push (context.Unit);	
+	input ['unit']= unit['@id'];
+	
+	let quantityKind = {}; 
+	quantityKind ['@id'] = quantityKindIRI;
+    quantityKind ['@type'] = [];
+	quantityKind ['@type'].push (context.namedIndividual);
+	quantityKind ['@type'].push (context.QuantityKind);	
+	input ['hasQuantityKind']= quantityKind ['@id'] ;
+	
+	
+	
+	graphLD.push(input);
+	graphLD.push(unit);
+	graphLD.push(quantityKind);
+	
+	
+	return IRI;
+}
+
+function createCalculationActivity (agentIRI, label, graphLD) {
+	
+	let IRI = dataPrefix + uuidv4();
+	let activity = {}; 
+	
+	activity ['@id'] = IRI;
+	activity ['@type'] = [];
+	activity ['@type'].push (context.namedIndividual);
+	activity ['@type'].push (context.Activity);
+	activity ['@type'].push (context.EmissionCalculationActivity);
+	if (agentIRI!=null) {
+		activity ['wasAssociatedWith'].push (agentIRI);
+	}
+	if (label!=null) {
+		activity ['label'] = label;
+	}
+	
+	graphLD.push(activity);
+	
+	return activity ['@id'];
+}
+
+
+
+
+function linkInputEntityToActivity (entityID,activityID,graphLD) {
+
+	graphLD.forEach (function (activity) {
+		if (activity['@id']=== activityID ) {
+			if (activity['used'] == null) {
+			  activity['used']= [];
+			  activity['used'].push( entityID);
+		    }
+			else {
+				activity['used'].push( entityID);
+			}
+		}
+	})
+
+}
+
+function linkOutputEntityToActivity (entityID,ActivityID,graphLD) {
+	graphLD.forEach (function (entity) {
+		if (entity['@id']=== entityID ) {
+			if (entity['wasGeneratedBy'] == null) {
+			  entity['wasGeneratedBy']= [];
+			  entity['wasGeneratedBy'].push( ActivityID);
+		    }
+			else {
+				entity['wasGeneratedBy'].push( ActivityID);
+			}
+		}
+	})
+
+}

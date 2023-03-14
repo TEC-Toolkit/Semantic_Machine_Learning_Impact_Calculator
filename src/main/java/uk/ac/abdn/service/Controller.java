@@ -74,6 +74,28 @@ import uk.ac.abdn.knowledgebase.EmbeddedModel;
 		
 		}
 		
+		@GetMapping("/cf_info")
+		public String cf_info( @RequestParam String cf_iri) {
+			
+			EmbeddedModel semModel = new EmbeddedModel ();  
+		    Gson gson = new Gson(); 
+			return gson.toJson(	Utils.getCFInfo (cf_iri,semModel));
+		    
+		
+		}
+		
+		@GetMapping("/cf_info_alternative_electricity")
+		public String cf_info_alternative( @RequestParam String region) {
+			
+			EmbeddedModel semModel = new EmbeddedModel ();  
+		    Gson gson = new Gson(); 
+			return gson.toJson(	Utils.getCFInfo_Alternative (region,semModel));
+		    
+		
+		}
+		
+		
+		
 		
 		
 		
