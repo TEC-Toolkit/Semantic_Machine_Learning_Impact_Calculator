@@ -319,14 +319,19 @@ const setDetails = (values) => {
 	 
 	 
 	 }
+	 if (html_string.length===0) {
+		html_string = '<tr><td colspan="8"> No Data Available</td> </tr>'
+	}
 	  console.log(html_string)
 	 let table_body = document.getElementById('cf_table_body_alternative');
 	 table_body.innerHTML = html_string;
 	 
 	 //assumption there is aonly one alternative suggestion
+	 
+	if (data[0]!=null) {
 	 let score_alternative = data[0].value*energy;
-	 document.getElementById('alternative_text').innerHTML="The emission score calculated using this factor would be " +score_alternative;
-	 console.log("The emission score calculated using this factor would be " +score_alternative)
+	 document.getElementById('alternative_text').innerHTML='<span style="color:red;">The emission score calculated using this factor would be <strong>' +score_alternative +'</strong></span>';
+	}
 	 }
 	 )
     //CF Alternative Table enf

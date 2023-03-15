@@ -315,7 +315,7 @@
 
                 <!-- details -->
 
-                <div id="result-details" class="details-hidden">
+                <div id="result-details" class="details-hidden overflow:auto;">
                     <div id="details-content" class="small text-black-50">
                         <div style="padding-top: 15px;">Power consumption x Time x Carbon Produced Based on the Local
                             Power Grid:
@@ -340,10 +340,41 @@
 						<div id="details-separator"></div>
 						<div>
 						<br>
-						<h3 style="color:red">Provenance of Emission Calculation</h3>
+						<h3 style="color:red">TEC Report</h3>
 		             	    <h4>Warnings</h4>
-						<div id="provTraceEval"> </div>
-						  <h4>Conversion Factors Used in This Calculation</h4>
+		             	    
+						<div id="provTraceEval" class="alert alert-warning" role="alert"> </div>
+						  
+						  <div id="accordion">
+						      <div class="card">
+                               <div class="card-header" >
+                                  <a href="#collapse8" class="accordion-button collapsed" type="button" data-toggle="collapse"  aria-expanded="false" aria-controls="#collapseTwo"> Data Transformations </a>
+                               </div> 
+                                 <div id="collapse8" class="collapse" aria-labelledby="heading8" data-bs-parent="#accordion">
+                                    <div class="card-body">
+                                    
+                                    <table class="table table-striped">
+                                   <thead>
+    <tr>
+						  <td>Id</td><td>Activity</td><td>Input</td><td>Output</td>
+						  </tr>
+                                   </thead>
+                                   <tbody>
+   
+                                   </tbody>
+                                   </table> 
+                                </div>
+                              </div>
+                          
+ </div>
+						 
+						  <div class="card">
+                               <div class="card-header" >
+                                    <a href="#collapse9" class="accordion-button collapsed" type="button" data-toggle="collapse"  aria-expanded="false" aria-controls="#collapseTwo"> Conversion Factor </a>
+                               </div> 
+                                 <div id="collapse9" class="collapse show" aria-labelledby="heading9" data-bs-parent="#accordion">
+                                    <div class="card-body">
+						  <strong>Conversion Factor Used in This Calculation</strong>
 						  <div class="table-responsive ">
 						  <table class="table table-bordered" >
 						  <thead>
@@ -357,7 +388,7 @@
 						  </table>
 						  </div>
 						  
-						<h4>Alternative Most Recent Conversion Factor</h4>
+						<strong>Alternative Conversion Factor</strong>
 						  <div class="table-responsive ">
 						  <table class="table table-bordered" >
 						  <thead>
@@ -371,7 +402,12 @@
 						  </table>
 						  </div>
 						  <div id="alternative_text"></div>
-						<div id="cfDetails"> </div>
+						</div>
+                      </div>
+                      <div id="cfDetails"> </div>
+		
+					</div>
+					</div>		
 							<!--
 							<h4>Provenance Graph</h4>
 							<div id="eo-provenance"></div>

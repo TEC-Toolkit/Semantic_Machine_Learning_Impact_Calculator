@@ -34,7 +34,7 @@ import uk.ac.abdn.knowledgebase.EmbeddedModel;
 
 public class Utils {
 	
-	static String prefixes = "PREFIX geo: <http://www.opengis.net/ont/geosparql#> PREFIX peco: <https://w3id.org/peco#> PREFIX ecfo: <https://w3id.org/ecfo#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> PREFIX owl: <http://www.w3.org/2002/07/owl#> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> PREFIX dash:<https://w3id.org/shp#> PREFIX prov:<http://www.w3.org/ns/prov#>"; 
+	static String prefixes = "PREFIX time: <http://www.w3.org/2006/time#> PREFIX geo: <http://www.opengis.net/ont/geosparql#> PREFIX peco: <https://w3id.org/peco#> PREFIX ecfo: <https://w3id.org/ecfo#>  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> PREFIX owl: <http://www.w3.org/2002/07/owl#> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> PREFIX dash:<https://w3id.org/shp#> PREFIX prov:<http://www.w3.org/ns/prov#>"; 
 	
 	
 	
@@ -130,16 +130,18 @@ public class Utils {
 		
 		ArrayList <HashMap <String,String>> list =  new ArrayList <HashMap <String,String>> ();
 		ResourceLoader resourceLoader = new DefaultResourceLoader();
-		 Resource conversion_factors_kg = resourceLoader.getResource("/data/ml_calculator.ttl");
+		 Resource conversion_factors_kg_ml = resourceLoader.getResource("/data/ml_calculator.ttl");
+		 Resource conversion_factors_kg = resourceLoader.getResource("/data/cf_2021.ttl");
 		 try {
 				semModel.loadData(conversion_factors_kg.getFile().getPath());
+				semModel.loadData(conversion_factors_kg_ml.getFile().getPath());
 			} catch (IOException e2) {
 				// TODO Auto-generated catch block
 				e2.printStackTrace();
 			}
 		
 		
-		 Query query = QueryFactory.create(prefixes + " Select distinct ?id ?sourceUnit ?targetUnit ?source ?value ?applicableLocation WHERE { ?id a ecfo:EmissionConversionFactor. OPTIONAL {?id ecfo:sourceUnit ?sourceUnit.} OPTIONAL {?id ecfo:targetUnit ?targetUnit.} OPTIONAL {?id prov:wasDerivedFrom ?source.} OPTIONAL {?id rdf:value ?value.} OPTIONAL {?id ecfo:hasApplicableLocation ?loc. ?loc rdfs:label ?applicableLocation. } VALUES ?id { <"+cf_iri+">}  }");
+		 Query query = QueryFactory.create(prefixes + " Select distinct ?id ?sourceUnit ?targetUnit ?source ?value ?applicableLocation ?applicablePeriodStart ?applicablePeriodEnd WHERE { ?id a ecfo:EmissionConversionFactor. OPTIONAL {?id ecfo:sourceUnit/rdfs:label ?sourceUnit.} OPTIONAL {?id ecfo:targetUnit/rdfs:label ?targetUnit.} OPTIONAL {?id prov:wasDerivedFrom ?source.} OPTIONAL {?id rdf:value ?value.} OPTIONAL {?id ecfo:hasApplicableLocation ?loc. ?loc rdfs:label ?applicableLocation. } OPTIONAL {?id ecfo:hasApplicablePeriod/time:hasEnd/time:inXSDDate ?applicablePeriodEnd.} OPTIONAL {?id ecfo:hasApplicablePeriod/time:hasBeginning/time:inXSDDate ?applicablePeriodStart.} VALUES ?id { <"+cf_iri+">}  }");
 		 System.out.println("Hello");
 		 System.out.println(query);
 		     QueryExecution qExe = QueryExecutionFactory.create( query, semModel.getModel());
@@ -177,7 +179,7 @@ public class Utils {
 			}
 		
 		
-		 Query query = QueryFactory.create(prefixes + " Select distinct  ?id ?sourceUnit ?targetUnit ?source ?value ?applicableLocation WHERE { ?current a ecfo:EmissionConversionFactor; ecfo:hasApplicableLocation ?currLoc; ecfo:targetUnit ?targetUnit. ?currLoc rdfs:label \""+region+"\". ?id a ecfo:EmissionConversionFactor; ecfo:hasTag <https://w3id.org/ecfo/i/Electricity%3A%20UK>; ecfo:hasTag <https://w3id.org/ecfo/i/Electricity%20generated> ; ecfo:hasApplicableLocation ?loc; ecfo:targetUnit ?targetUnit. ?loc geo:ehContains ?currLoc. OPTIONAL {?id ecfo:sourceUnit ?sourceUnit.} OPTIONAL {?id ecfo:targetUnit ?targetUnit.} OPTIONAL {?id prov:wasDerivedFrom ?source.} OPTIONAL {?id rdf:value ?value.}    }");
+		 Query query = QueryFactory.create(prefixes + " Select distinct  ?id ?sourceUnit ?targetUnit ?source ?value ?applicableLocation ?applicablePeriodStart ?applicablePeriodEnd WHERE { ?current a ecfo:EmissionConversionFactor; ecfo:hasApplicableLocation ?currLoc; ecfo:targetUnit/rdfs:label ?targetUnit. ?currLoc rdfs:label \""+region+"\". ?id a ecfo:EmissionConversionFactor; ecfo:hasTag <https://w3id.org/ecfo/i/Electricity%3A%20UK>; ecfo:hasTag <https://w3id.org/ecfo/i/Electricity%20generated> ; ecfo:hasApplicableLocation ?applicableLocation; ecfo:targetUnit/rdfs:label ?targetUnit. ?applicableLocation geo:ehContains ?currLoc. OPTIONAL {?id ecfo:sourceUnit/rdfs:label ?sourceUnit.} OPTIONAL {?id ecfo:hasApplicablePeriod/time:hasBeginning/time:inXSDDate ?applicablePeriodStart.  } OPTIONAL {?id ecfo:hasApplicablePeriod/time:hasEnd/time:inXSDDate ?applicablePeriodEnd.  } OPTIONAL {?id ecfo:targetUnit ?targetUnit.} OPTIONAL {?id prov:wasDerivedFrom ?source.} OPTIONAL {?id rdf:value ?value.}    }");
 		// Query query = QueryFactory.create(prefixes + " Select distinct  ?current ?id ?currLoc ?loc ?tarU1 ?tarU2 ?applicableLocation  ?locA WHERE { ?current a ecfo:EmissionConversionFactor; ecfo:hasApplicableLocation ?currLoc; ecfo:targetUnit ?tarU1. ?currLoc rdfs:label \""+region+"\". ?id a ecfo:EmissionConversionFactor; ecfo:hasTag <https://w3id.org/ecfo/i/Electricity%3A%20UK>; ecfo:hasApplicableLocation ?loc;ecfo:targetUnit ?tarU1. ?loc geo:ehContains ?currLoc. }");
 		 
 		 System.out.println(query);
