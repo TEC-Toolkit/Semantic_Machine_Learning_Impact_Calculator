@@ -22,6 +22,7 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -47,8 +48,24 @@ import uk.ac.abdn.knowledgebase.EmbeddedModel;
 	
 	@RestController
 	public class Controller {
-		
+		 
+		EmbeddedModel semModel = new EmbeddedModel ();  
 	
+		 @Autowired
+		    public void setUpKG() {
+			 ResourceLoader resourceLoader = new DefaultResourceLoader();
+			 Resource conversion_factors_kg_ml = resourceLoader.getResource("/data/ml_calculator.ttl");
+			 Resource conversion_factors_kg = resourceLoader.getResource("/data/cf_2021.ttl");
+			 try {
+					semModel.loadData(conversion_factors_kg.getFile().getPath());
+					semModel.loadData(conversion_factors_kg_ml.getFile().getPath());
+				} catch (IOException e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
+				}
+		    }
+		
+		
 		@CrossOrigin(origins = "*")
 		@PostMapping("/evaluateTrace")
 		@ResponseBody
@@ -77,17 +94,25 @@ import uk.ac.abdn.knowledgebase.EmbeddedModel;
 		@GetMapping("/cf_info")
 		public String cf_info( @RequestParam String cf_iri) {
 			
-			EmbeddedModel semModel = new EmbeddedModel ();  
+			//EmbeddedModel semModel = new EmbeddedModel ();  
 		    Gson gson = new Gson(); 
 			return gson.toJson(	Utils.getCFInfo (cf_iri,semModel));
-		    
+
+		}
 		
+		@GetMapping("/get_CF")
+		public String get_CF( @RequestParam String providerName, @RequestParam String region) {
+			
+			
+		    Gson gson = new Gson(); 
+			return gson.toJson(	Utils.getCF_For_Provider_Region (providerName,region,semModel));
+
 		}
 		
 		@GetMapping("/cf_info_alternative_electricity")
 		public String cf_info_alternative( @RequestParam String region) {
 			
-			EmbeddedModel semModel = new EmbeddedModel ();  
+			
 		    Gson gson = new Gson(); 
 			return gson.toJson(	Utils.getCFInfo_Alternative (region,semModel));
 		    

@@ -129,17 +129,6 @@ public class Utils {
 	public static ArrayList <HashMap <String,String>> getCFInfo(String cf_iri, EmbeddedModel semModel) {
 		
 		ArrayList <HashMap <String,String>> list =  new ArrayList <HashMap <String,String>> ();
-		ResourceLoader resourceLoader = new DefaultResourceLoader();
-		 Resource conversion_factors_kg_ml = resourceLoader.getResource("/data/ml_calculator.ttl");
-		 Resource conversion_factors_kg = resourceLoader.getResource("/data/cf_2021.ttl");
-		 try {
-				semModel.loadData(conversion_factors_kg.getFile().getPath());
-				semModel.loadData(conversion_factors_kg_ml.getFile().getPath());
-			} catch (IOException e2) {
-				// TODO Auto-generated catch block
-				e2.printStackTrace();
-			}
-		
 		
 		 Query query = QueryFactory.create(prefixes + " Select distinct ?id ?sourceUnit ?targetUnit ?source ?value ?applicableLocation ?applicablePeriodStart ?applicablePeriodEnd WHERE { ?id a ecfo:EmissionConversionFactor. OPTIONAL {?id ecfo:sourceUnit/rdfs:label ?sourceUnit.} OPTIONAL {?id ecfo:targetUnit/rdfs:label ?targetUnit.} OPTIONAL {?id prov:wasDerivedFrom ?source.} OPTIONAL {?id rdf:value ?value.} OPTIONAL {?id ecfo:hasApplicableLocation ?loc. ?loc rdfs:label ?applicableLocation. } OPTIONAL {?id ecfo:hasApplicablePeriod/time:hasEnd/time:inXSDDate ?applicablePeriodEnd.} OPTIONAL {?id ecfo:hasApplicablePeriod/time:hasBeginning/time:inXSDDate ?applicablePeriodStart.} VALUES ?id { <"+cf_iri+">}  }");
 		 System.out.println("Hello");
@@ -158,30 +147,16 @@ public class Utils {
 	        	
 	        	list.add(map);
 	         }
-	         System.out.println("LIST");
-	         System.out.println(semModel.getModel().size());
+	        
 	         System.out.println(list);
 		
 		return list; 
 	}
 
 	public static ArrayList<HashMap<String, String>> getCFInfo_Alternative(String region, EmbeddedModel semModel) {
-		ArrayList <HashMap <String,String>> list =  new ArrayList <HashMap <String,String>> ();
-		ResourceLoader resourceLoader = new DefaultResourceLoader();
-		Resource conversion_factors_kg = resourceLoader.getResource("/data/cf_2021.ttl");
-		Resource conversion_factors_kg_ml = resourceLoader.getResource("/data/ml_calculator.ttl");
-		 try {
-				semModel.loadData(conversion_factors_kg.getFile().getPath());
-				semModel.loadData(conversion_factors_kg_ml.getFile().getPath());
-			} catch (IOException e2) {
-				// TODO Auto-generated catch block
-				e2.printStackTrace();
-			}
 		
-		
-		 Query query = QueryFactory.create(prefixes + " Select distinct  ?id ?sourceUnit ?targetUnit ?source ?value ?applicableLocation ?applicablePeriodStart ?applicablePeriodEnd WHERE { ?current a ecfo:EmissionConversionFactor; ecfo:hasApplicableLocation ?currLoc; ecfo:targetUnit/rdfs:label ?targetUnit. ?currLoc rdfs:label \""+region+"\". ?id a ecfo:EmissionConversionFactor; ecfo:hasTag <https://w3id.org/ecfo/i/Electricity%3A%20UK>; ecfo:hasTag <https://w3id.org/ecfo/i/Electricity%20generated> ; ecfo:hasApplicableLocation ?applicableLocation; ecfo:targetUnit/rdfs:label ?targetUnit. ?applicableLocation geo:ehContains ?currLoc. OPTIONAL {?id ecfo:sourceUnit/rdfs:label ?sourceUnit.} OPTIONAL {?id ecfo:hasApplicablePeriod/time:hasBeginning/time:inXSDDate ?applicablePeriodStart.  } OPTIONAL {?id ecfo:hasApplicablePeriod/time:hasEnd/time:inXSDDate ?applicablePeriodEnd.  } OPTIONAL {?id ecfo:targetUnit ?targetUnit.} OPTIONAL {?id prov:wasDerivedFrom ?source.} OPTIONAL {?id rdf:value ?value.}    }");
-		// Query query = QueryFactory.create(prefixes + " Select distinct  ?current ?id ?currLoc ?loc ?tarU1 ?tarU2 ?applicableLocation  ?locA WHERE { ?current a ecfo:EmissionConversionFactor; ecfo:hasApplicableLocation ?currLoc; ecfo:targetUnit ?tarU1. ?currLoc rdfs:label \""+region+"\". ?id a ecfo:EmissionConversionFactor; ecfo:hasTag <https://w3id.org/ecfo/i/Electricity%3A%20UK>; ecfo:hasApplicableLocation ?loc;ecfo:targetUnit ?tarU1. ?loc geo:ehContains ?currLoc. }");
-		 
+		 ArrayList <HashMap <String,String>> list =  new ArrayList <HashMap <String,String>> ();
+		 Query query = QueryFactory.create(prefixes + " Select distinct  ?id ?sourceUnit ?targetUnit ?source ?value ?applicableLocation ?applicablePeriodStart ?applicablePeriodEnd WHERE { ?current a ecfo:EmissionConversionFactor; ecfo:hasApplicableLocation ?currLoc; ecfo:targetUnit/rdfs:label ?targetUnit. ?currLoc rdfs:label \""+region+"\". ?id a ecfo:EmissionConversionFactor; ecfo:hasTag <https://w3id.org/ecfo/i/Electricity%3A%20UK>; ecfo:hasTag <https://w3id.org/ecfo/i/Electricity%20generated> ; ecfo:hasApplicableLocation ?applicableLocation; ecfo:targetUnit/rdfs:label ?targetUnit. ?applicableLocation geo:ehContains ?currLoc. OPTIONAL {?id ecfo:sourceUnit/rdfs:label ?sourceUnit.} OPTIONAL {?id ecfo:hasApplicablePeriod/time:hasBeginning/time:inXSDDate ?applicablePeriodStart.  } OPTIONAL {?id ecfo:hasApplicablePeriod/time:hasEnd/time:inXSDDate ?applicablePeriodEnd.  } OPTIONAL {?id ecfo:targetUnit ?targetUnit.} OPTIONAL {?id prov:wasDerivedFrom ?source.} OPTIONAL {?id rdf:value ?value.}    }");	 
 		 System.out.println(query);
 		     QueryExecution qExe = QueryExecutionFactory.create( query, semModel.getModel());
 	         ResultSet results = qExe.execSelect();
@@ -197,11 +172,34 @@ public class Utils {
 	        	
 	        	list.add(map);
 	         }
-	         System.out.println("LIST");
-	         System.out.println(semModel.getModel().size());
+	        
 	         System.out.println(list);
 		
 		return list; 
+	}
+
+	public static HashMap<String, String>  getCF_For_Provider_Region(String providerName, String region, EmbeddedModel semModel) {
+		 
+		
+		
+		 Query query = QueryFactory.create(prefixes + " Select distinct ?id ?value WHERE { ?id a ecfo:EmissionConversionFactor; ecfo:hasApplicableLocation/rdfs:label \""+region+"\"; ecfo:hasTag/rdfs:label \""+providerName+"\";rdf:value ?value. } Limit 1");
+		 System.out.println("Hello");
+		 System.out.println(query);
+		     QueryExecution qExe = QueryExecutionFactory.create( query, semModel.getModel());
+	         ResultSet results = qExe.execSelect();
+            
+	         
+	        	QuerySolution sol = results.next();
+	        	Iterator<String> it = sol.varNames();
+	        	HashMap <String, String> map = new HashMap <String, String> ();
+	        	while (it.hasNext()) {
+	        		String varName = it.next();
+	        		map.put(varName,parsePrefix( sol.get(varName).toString()));
+	        	}
+	        
+	         System.out.println(map);
+		
+		return map; 
 	}
 	
 	 

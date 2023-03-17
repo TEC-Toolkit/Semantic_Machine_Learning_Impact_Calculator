@@ -80,10 +80,12 @@ const getValues = () => {
   const customImpact = provider !== "custom" ? null : parseFloat($("#compute-custom-impact").val());
   const customOffset = provider !== "custom" ? null : parseFloat($("#compute-custom-offset").val());
   const hours = parseFloat($("#compute-hours").val());
+  const providerName = $("#compute-provider option:selected").text();
   return {
-    gpu, provider, region, hours, customImpact, customOffset
+    gpu, provider, region, hours, customImpact, customOffset,providerName
   }
 }
+
 
 const scrollToBottomResultCard = () => {
   const cardOffset = $("#result-card").offset().top + $("#result-card").outerHeight() - $(window).height() + 50;
@@ -152,7 +154,7 @@ const check = (type, value) => {
 
 const checkForm = () => {
   const values = getValues();
-  const { gpu, provider, region, hours } = values;
+  const { gpu, provider, region, hours, providerName } = values;
   let failed = false;
 
   FEATURES.forEach((v, k) => {
@@ -185,7 +187,7 @@ const setDetails = (values) => {
 	 console.log("set detailsl called");
   let graphLD = [];
   console.log({ values });
-  const { gpu, hours, provider, region, customImpact, customOffset } = values
+  const { gpu, hours, provider, region, customImpact, customOffset, providerName } = values
   const energy = twoDigits(state.gpus[gpu].watt * hours / 1000); // kWh
   //record provenance of calculation --------- START
   let wattConsumption = createCalculationEntity ("Watt Consumption", state.gpus[gpu].watt,"http://qudt.org/2.1/vocab/unit/W","http://example.com/ThermalDesignPower",graphLD,"")
@@ -206,10 +208,23 @@ const setDetails = (values) => {
   console.log(generateJsonLDstring(graphLD))
    console.log(state)
   
-  const impact = Number.isFinite(customImpact) ? customImpact : twoDigits(state.providers[provider][region].impact / 1000); // kg/kwH
+  
+  
+  
+ // const impact = Number.isFinite(customImpact) ? customImpact : twoDigits(state.providers[provider][region].impact / 1000); // kg/kwH
+   fetch('http://localhost:8080/get_CF?region='+region+'&providerName='+providerName+'')
+	 .then ((response) => 
+		 response.json()
+	 )
+	 .then ((CF_data) => {
+		console.log(CF_data) 
+	const impact = twoDigits(CF_data.value);
+	const CF_IRI = CF_data.id
+	
+  
   const co2 = twoDigits(energy * impact);
    //record provenance of calculation --------- START
-  let CF_IRI = "https://github.com/mlco2/impact/"+provider+"/"+region+"/CF";
+ // let CF_IRI = "https://github.com/mlco2/impact/"+provider+"/"+region+"/CF";
   let conversionFactor = createConversionFactor ("Electricity CF",impact, null,"http://example.com/kgCO2eq",null,state.providers[provider][region].source,null,null,region,graphLD,"" )
   linkInputEntityToActivity (conversionFactor,emissionCalculation,graphLD)
   
@@ -383,8 +398,9 @@ const setDetails = (values) => {
       )
     }
   }
-
-
+//end first fetch()
+ }
+	 )
 }
 
 const scientificNotation = (n, d) => {
