@@ -2,7 +2,7 @@ var context = {};
 var prov_prefix = "http://www.w3.org/ns/prov#"
 var peco_prefix = "https://w3id.org/peco#"
 var ecfo_prefix = "https://w3id.org/ecfo#"
-var qudt_prefix = "https://qudt.org/2.1/schema/qudt/"
+var qudt_prefix = "https://qudt.org/schema/qudt/"
 var sosa_prefix = "http://www.w3.org/ns/sosa/"
 
 //RDF 

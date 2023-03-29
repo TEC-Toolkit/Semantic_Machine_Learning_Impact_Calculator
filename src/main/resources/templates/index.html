@@ -350,16 +350,16 @@
                                <div class="card-header" >
                                   <a href="#collapse8" class="accordion-button collapsed" type="button" data-toggle="collapse"  aria-expanded="false" aria-controls="#collapseTwo"> Data Transformations </a>
                                </div> 
-                                 <div id="collapse8" class="collapse" aria-labelledby="heading8" data-bs-parent="#accordion">
+                                 <div id="collapse8" class="collapse show" aria-labelledby="heading8" data-bs-parent="#accordion">
                                     <div class="card-body">
                                     
-                                    <table class="table table-striped">
+                                    <table  class="table table-striped">
                                    <thead>
     <tr>
-						  <td>Id</td><td>Activity</td><td>Input</td><td>Output</td>
+						  <td>Activity</td><td>Input</td><td>Output</td>
 						  </tr>
                                    </thead>
-                                   <tbody>
+                                   <tbody id="data_transformations_table_body">
    
                                    </tbody>
                                    </table> 
@@ -372,14 +372,14 @@
                                <div class="card-header" >
                                     <a href="#collapse9" class="accordion-button collapsed" type="button" data-toggle="collapse"  aria-expanded="false" aria-controls="#collapseTwo"> Conversion Factor </a>
                                </div> 
-                                 <div id="collapse9" class="collapse show" aria-labelledby="heading9" data-bs-parent="#accordion">
+                                 <div id="collapse9" class="collapse " aria-labelledby="heading9" data-bs-parent="#accordion">
                                     <div class="card-body">
-						  <strong>Conversion Factor Used in This Calculation</strong>
+						  <strong>Relevant Conversion Factors (Green row indicates the conversion factor used in this calculation)</strong>
 						  <div >
 						  <table class="table table-bordered" style="table-layout:fixed;width:100%; ">
 						  <thead>
 						  <tr>
-						  <th class="col-1">Id</th><th>Applicable Location</th><th>Source Unit</th><th>Target Unit</th><th>Applicable Period Start</th><th>Applicable Period End</th><th>Value</th><th>Source</th>
+						  <th class="col-1">Source Unit</th><th>Target Unit</th><th>Applicable Period Start</th><th>Applicable Period End</th><th>Applicable Location</th><th>CF Value</th><th>CF IRI</th><th>Source</th><th>Emission Score <span id="score_value"></span></th>
 						  </tr>
 						  </thead>
 						  <tbody  id="cf_table_body">
@@ -387,7 +387,7 @@
 						  
 						  </table>
 						  </div>
-						  
+						  <!--
 						<strong>Alternative Conversion Factor</strong>
 						  <div >
 						  <table class="table table-bordered" style="table-layout:fixed;width:100%; ">
@@ -402,6 +402,8 @@
 						  </table>
 						  </div>
 						  <div id="alternative_text"></div>
+						  -->
+						  
 						</div>
                       </div>
                       <div id="cfDetails"> </div>

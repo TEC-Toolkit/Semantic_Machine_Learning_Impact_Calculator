@@ -56,9 +56,14 @@ import uk.ac.abdn.knowledgebase.EmbeddedModel;
 			 ResourceLoader resourceLoader = new DefaultResourceLoader();
 			 Resource conversion_factors_kg_ml = resourceLoader.getResource("/data/ml_calculator.ttl");
 			 Resource conversion_factors_kg = resourceLoader.getResource("/data/cf_2021.ttl");
+			 Resource conversion_factors_kg2 = resourceLoader.getResource("/data/cf_2022.ttl");
 			 try {
 					semModel.loadData(conversion_factors_kg.getFile().getPath());
 					semModel.loadData(conversion_factors_kg_ml.getFile().getPath());
+					semModel.loadData(conversion_factors_kg2.getFile().getPath());
+					semModel.getModel().read("https://qudt.org/vocab/unit/");
+					semModel.getModel().read("https://tec-toolkit.github.io/PECO/release/0.0.1/ontology.ttl");
+					semModel.getModel().read("https://tec-toolkit.github.io/ECFO/release/0.0.1/ontology.ttl");
 				} catch (IOException e2) {
 					// TODO Auto-generated catch block
 					e2.printStackTrace();
@@ -91,6 +96,21 @@ import uk.ac.abdn.knowledgebase.EmbeddedModel;
 		
 		}
 		
+		@PostMapping("/getDataTransformations")
+		@ResponseBody
+		public String getDatatTransformations( @RequestBody String payload) {		
+			
+			ArrayList <HashMap <String,String>> result = Utils.getDatatTransformations (payload,semModel);
+			
+			
+		    Gson gson = new Gson(); 
+		    
+		    System.out.println(gson.toJson(result));
+			return gson.toJson(result);
+		    
+		
+		}
+		
 		@GetMapping("/cf_info")
 		public String cf_info( @RequestParam String cf_iri) {
 			
@@ -109,12 +129,12 @@ import uk.ac.abdn.knowledgebase.EmbeddedModel;
 
 		}
 		
-		@GetMapping("/cf_info_alternative_electricity")
+		@GetMapping("/cf_info_all")
 		public String cf_info_alternative( @RequestParam String region) {
 			
 			
 		    Gson gson = new Gson(); 
-			return gson.toJson(	Utils.getCFInfo_Alternative (region,semModel));
+			return gson.toJson(	Utils.getCFInfo_All (region,semModel));
 		    
 		
 		}

@@ -189,10 +189,13 @@ const setDetails = (values) => {
   console.log({ values });
   const { gpu, hours, provider, region, customImpact, customOffset, providerName } = values
   const energy = twoDigits(state.gpus[gpu].watt * hours / 1000); // kWh
+  
+  
+  
   //record provenance of calculation --------- START
-  let wattConsumption = createCalculationEntity ("Watt Consumption", state.gpus[gpu].watt,"http://qudt.org/2.1/vocab/unit/W","http://example.com/ThermalDesignPower",graphLD,"")
-  let electricityUse = createCalculationEntity ("Electricity Use", hours,"http://qudt.org/2.1/vocab/unit/HR","http://qudt.org/2.1/vocab/quantitykind/Time",graphLD,"")
-  let energyUsed = createCalculationEntity ("Energy Used", energy,"http://qudt.org/2.1/vocab/unit/KiloW-HR","http://qudt.org/2.1/vocab/quantitykind/Energy",graphLD,"")
+  let wattConsumption = createCalculationEntity ("Watt Consumption", state.gpus[gpu].watt,"http://qudt.org/vocab/unit/W","http://www.wikidata.org/entity/Q1053879",graphLD,"")
+  let electricityUse = createCalculationEntity ("Electricity Use", hours,"http://qudt.org/vocab/unit/HR","http://www.wikidata.org/entity/Q3517751",graphLD,"")
+  let energyUsed = createCalculationEntity ("Energy Used", energy,"https://w3id.org/ecfo/i/kWh","http://www.wikidata.org/entity/Q12725",graphLD,"")
  
  
   let electricityUseEstimate = createCalculationActivity (null,"Estimate Electricity Use in kW/h",graphLD)
@@ -212,23 +215,23 @@ const setDetails = (values) => {
   
   
  // const impact = Number.isFinite(customImpact) ? customImpact : twoDigits(state.providers[provider][region].impact / 1000); // kg/kwH
-   fetch('http://localhost:8080/get_CF?region='+region+'&providerName='+providerName+'')
+   fetch('http://localhost:8080/cf_info_all?region='+region)
 	 .then ((response) => 
 		 response.json()
 	 )
 	 .then ((CF_data) => {
 		console.log(CF_data) 
-	const impact = twoDigits(CF_data.value);
-	const CF_IRI = CF_data.id
+	const impact = twoDigits(CF_data[0].value);
+	const CF_IRI = CF_data[0].id
 	
   
   const co2 = twoDigits(energy * impact);
    //record provenance of calculation --------- START
  // let CF_IRI = "https://github.com/mlco2/impact/"+provider+"/"+region+"/CF";
-  let conversionFactor = createConversionFactor ("Electricity CF",impact, null,"http://example.com/kgCO2eq",null,state.providers[provider][region].source,null,null,region,graphLD,"" )
-  linkInputEntityToActivity (conversionFactor,emissionCalculation,graphLD)
+ // let conversionFactor = createConversionFactor ("Electricity CF",impact, null,"http://example.com/kgCO2eq",null,state.providers[provider][region].source,null,null,region,graphLD,"" )
+  linkInputEntityToActivity (CF_IRI,emissionCalculation,graphLD)
   
-  let emissionScore = createCalculationEntity ("Emission Score",co2,"http://example.com/kgCO2eq","https://w3id.org/peco#EmissionScore",graphLD,"")
+  let emissionScore = createCalculationEntity ("Emission Score",co2,"https://w3id.org/ecfo/i/kg%20CO2e","https://w3id.org/peco#EmissionScore",graphLD,"")
   linkOutputEntityToActivity (emissionScore,emissionCalculation,graphLD)
   
   //record provenance of calculation --------- END
@@ -236,8 +239,7 @@ const setDetails = (values) => {
   console.log (graphLD);
   
   let graph_ld_object = generateJsonObject (graphLD);
-  let test = `{"@context": "http://schema.org/","@type": "http://example.com/Person"
-}`
+  
 
  //CHECK THE GRAPH 
   
@@ -260,7 +262,81 @@ const setDetails = (values) => {
 		 console.log(data)
 	 document.getElementById ('provTraceEval').innerHTML = data.validity
 	 }
+	 );
+  ///
+  
+  // PRINT TRANSFORMATIONS TABLE
+    fetch('http://localhost:8080/getDataTransformations', {
+         method: 'POST',
+	     mode: "cors", // no-cors, *cors, same-origin
+         body:  generateJsonLDstring (graphLD)
+         ,
+         headers: {
+             'Content-type': 'application/json; charset=UTF-8',
+			   'Access-Control-Allow-Origin':'*'
+         },
+     })
+	 .then ((response) => 
+		 response.json()
 	 )
+	 .then ((data) => {
+		 
+		 console.log(data)
+	 
+	 let list = {};
+	 
+	 for (i=0;i<data.length;i++) {
+		list[data[i].activityLabel] = {};
+		list[data[i].activityLabel]["input"] = []
+		list[data[i].activityLabel]["output"] = []
+		}
+	 
+	 for (var prop in list) {
+         for (i=0;i<data.length;i++) {
+		if (data[i].activityLabel == prop) {
+			let input = data[i].inputLabel + " (v:"+data[i].inputValue+", unit: "+data[i].inputUnitLabel+", type: "+ data[i].inputQuantityKindL +")<hr>"
+			list[prop]["input"].push (input);
+			
+			let output = data[i].outputLabel + " (v:"+data[i].outputValue+", unit: "+data[i].outputUnitLabel+", type: "+ data[i].outputQuantityKindL +")<hr>"
+			if (!list[prop]["output"].includes(output)) {
+				
+			list[prop]["output"].push (output);
+			}
+			
+		}
+		}
+     }
+	 
+	 let html_string = "";
+	 for (var prop in list) {
+		
+			 html_string = html_string + "<tr>"
+		
+	
+	  html_string = html_string + "<td>"+prop+"</td>"
+	  html_string = html_string + "<td>";
+	   for (i=0;i<list[prop]["input"].length;i++) {
+	  html_string = html_string + list[prop]["input"][i]
+	}
+	   html_string = html_string + "</td>";
+	   
+	   html_string = html_string + "<td>";
+	   for (i=0;i<list[prop]["output"].length;i++) {
+	  html_string = html_string + list[prop]["output"][i]
+	}
+	   html_string = html_string + "</td>";
+	
+
+	 html_string =html_string + "</tr>"
+	 
+	 
+	 
+	 }
+	  console.log(html_string)
+	 let table_body = document.getElementById('data_transformations_table_body');
+	 table_body.innerHTML = html_string;
+	 }
+	 );
   ///
   
   
@@ -268,30 +344,35 @@ const setDetails = (values) => {
   //Print CF table
  
  
-
+     document.getElementById ('score_value').innerHTML = "<br>"+ energy+" (kWh)"
  
- fetch('http://localhost:8080/cf_info?cf_iri='+CF_IRI )
-	 .then ((response) => 
-		 response.json()
-	 )
-	 .then ((data) => {
 
-	 console.log("hello")
-	 console.log(data)
 	 let html_string = "";
 	 
-	 for (i=0;i<data.length;i++) {
-	 html_string = html_string + "<tr>"
-	 html_string = html_string + "<td>"+data[i].id+"</td>"
+	 for (i=0;i<CF_data.length;i++) {
+		if (i==0) {
+			 html_string = html_string + '<tr style="background-color:#CCF6D3 ;">'
+		}
+		else {
+			 html_string = html_string + "<tr>"
+		}
+	
+	  html_string = html_string + "<td>"+CF_data[i].sourceUnit+"</td>"
+	 html_string = html_string + "<td>"+CF_data[i].targetUnit+"</td>"
+	
+	  html_string = html_string + "<td>"+CF_data[i].applicablePeriodStart+"</td>"
+	  html_string = html_string + "<td>"+CF_data[i].applicablePeriodEnd+"</td>"
+	 html_string = html_string + "<td>"+CF_data[i].applicableLocation+"</td>"
 	 
-	 html_string = html_string + "<td>"+data[i].applicableLocation+"</td>"
-	 
-	 html_string = html_string + "<td>"+data[i].sourceUnit+"</td>"
-	 html_string = html_string + "<td>"+data[i].targetUnit+"</td>"
-	 html_string = html_string + "<td>"+data[i].applicablePeriodStart+"</td>"
-	  html_string = html_string + "<td>"+data[i].applicablePeriodEnd+"</td>"
-	  html_string = html_string + "<td>"+data[i].value+"</td>"
-	   html_string = html_string + "<td>"+data[i].source+"</td>"
+	
+	
+	  html_string = html_string + "<td>"+CF_data[i].value+"</td>"
+	  
+	  
+	  
+	   html_string = html_string + "<td><a href=\""+CF_data[i].source+"\">link</a></td>"
+	   html_string = html_string + "<td><a href=\""+CF_data[i].id+"\">link</a></td>"
+	     html_string = html_string + "<td>"+twoDigits(energy* twoDigits(CF_data[i].value))+"("+CF_data[i].targetUnit+")</td>"
 	 html_string =html_string + "</tr>"
 	 
 	 
@@ -301,13 +382,12 @@ const setDetails = (values) => {
 	 let table_body = document.getElementById('cf_table_body');
 	 table_body.innerHTML = html_string;
 	 
-	 }
-	 )
+	
    
    
   
   //CF Table enf
-  
+ /* 
     //CF Alternative Table start
   fetch('http://localhost:8080/cf_info_alternative_electricity?region='+region )
 	 .then ((response) => 
@@ -350,7 +430,7 @@ const setDetails = (values) => {
 	 }
 	 )
     //CF Alternative Table enf
-  
+*/  
   console.log (graph_ld_object);
     $('#graph').empty();
  // d3.jsonldVis(graph_ld_object, '#graph', {  maxLabelWidth: 550 });
