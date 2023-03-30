@@ -1,1 +1,1 @@
-"Q1"," Select distinct ?id ?sourceUnit ?applicableLocation ?targetUnit ?source ?value WHERE { ?id a ecfo:EmissionConversionFactor. OPTIONAL {?id ecfo:sourceUnit ?sourceUnit.} OPTIONAL {?id ecfo:targetUnit ?targetUnit.} OPTIONAL {?id prov:wasDerivedFrom ?source.} OPTIONAL {?id rdf:value ?value.}}"
+"CF-Out-Of-Date-Violation","Select distinct ?cf ?cf_value ?time WHERE { ?entity qudt:hasQuantityKind peco:EmissionScore;prov:wasGeneratedBy/prov:used ?cf. ?cf ecfo:hasApplicablePeriod/time:hasEnd/time:inXSDDate ?time; rdf:value ?cf_value. Filter (?time < now())}"

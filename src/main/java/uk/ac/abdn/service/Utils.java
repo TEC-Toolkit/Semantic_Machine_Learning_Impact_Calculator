@@ -21,10 +21,14 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFParser;
 import org.apache.jena.riot.system.ErrorHandlerFactory;
 import org.apache.jena.sparql.util.Context;
+import org.apache.jena.util.FileUtils;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.ui.Model;
+import org.topbraid.shacl.rules.RuleUtil;
+import org.topbraid.shacl.util.ModelPrinter;
+import org.topbraid.shacl.validation.ValidationUtil;
 
 import com.google.gson.JsonElement;
 import com.opencsv.CSVReader;
@@ -38,40 +42,26 @@ public class Utils {
 	
 	
 	
-	public static void executeQueriesFromCSV (Model model,String payload, EmbeddedModel semModel)  {
+	public static void executeQueriesFromCSV (Model modelResults,String payload, EmbeddedModel semModel)  {
 		
 			
 		
 		ResourceLoader resourceLoader = new DefaultResourceLoader();
 		Resource queriesFile = resourceLoader.getResource("/query/queries.csv");
 		
-		
-		//Resource peco = resourceLoader.getResource("/data/peco.ttl");
-		Resource conversion_factors_kg = resourceLoader.getResource("/data/ml_calculator.ttl");
-		
 		Reader reader;
-		//System.out.println(payload);
 		
-				
-		try {
-			semModel.loadData(conversion_factors_kg.getFile().getPath());
-		} catch (IOException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
-			
-			
 		
-		semModel.getModel().read(new ByteArrayInputStream(payload.getBytes()), null, "JSON-LD");
-		//try {
-			//semModel.loadData(payload);
-			//semModel.loadData(ecfo.getFile().getPath());
-		/*} catch (IOException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}     */
-	        System.out.println(semModel.getModel().size());
-	     
+        EmbeddedModel model = new EmbeddedModel ();
+		
+		model.getModel().read(new ByteArrayInputStream(payload.getBytes()), null, "JSON-LD");
+		System.out.println("Prov trace");
+		System.out.println(model.getModel().size());
+	
+		 
+		model.getModel().add(semModel.getModel());
+		
+		System.out.println(model.getModel().size());
 		
 		try {
 			reader = new InputStreamReader(queriesFile.getInputStream());
@@ -82,27 +72,27 @@ public class Utils {
 		            	 System.out.println(r.get(i)[1]);
 		            	 Query query = QueryFactory.create(prefixes + " "+ r.get(i)[1].replaceAll("\uFEFF", ""));
 		            	 System.out.println(query);
-		      		     QueryExecution qExe = QueryExecutionFactory.create( query, semModel.getModel());
+		      		     QueryExecution qExe = QueryExecutionFactory.create( query, model.getModel());
 		      	         ResultSet results = qExe.execSelect();
 		      	         System.out.println(r.get(i)[0]);
 		      	         
 		      	         ArrayList <HashMap <String,String>> list = new ArrayList <HashMap <String,String>> ();
-		      	         
+		      	       System.out.println(results.hasNext());
 		      	         while (results.hasNext()) {
 		      	        	QuerySolution sol = results.next();
 		      	        	Iterator<String> it = sol.varNames();
 		      	        	HashMap <String, String> map = new HashMap <String, String> ();
 		      	        	while (it.hasNext()) {
 		      	        		String varName = it.next();
-		      	        		map.put(varName,parsePrefix( sol.get(varName).toString()));
+		      	        		map.put(varName,sol.get(varName).toString());
 		      	        	}
 		      	        	
 		      	        	list.add(map);
 		      	         }
 		      	        
+		      	       System.out.println(list);
+		      	       modelResults.addAttribute(r.get(i)[0], list);
 		      	        
-		      	         model.addAttribute(r.get(i)[0], list);
-		      	         System.out.println(list);
 		            }
 
 		        } catch (IOException | CsvException e) {
@@ -131,8 +121,6 @@ public class Utils {
 		ArrayList <HashMap <String,String>> list =  new ArrayList <HashMap <String,String>> ();
 		
 		 Query query = QueryFactory.create(prefixes + " Select distinct ?id ?sourceUnit ?targetUnit ?source ?value ?applicableLocation ?applicablePeriodStart ?applicablePeriodEnd WHERE { ?id a ecfo:EmissionConversionFactor. OPTIONAL {?id ecfo:sourceUnit/rdfs:label ?sourceUnit.} OPTIONAL {?id ecfo:targetUnit/rdfs:label ?targetUnit.} OPTIONAL {?id prov:wasDerivedFrom ?source.} OPTIONAL {?id rdf:value ?value.} OPTIONAL {?id ecfo:hasApplicableLocation ?loc. ?loc rdfs:label ?applicableLocation. } OPTIONAL {?id ecfo:hasApplicablePeriod/time:hasEnd/time:inXSDDate ?applicablePeriodEnd.} OPTIONAL {?id ecfo:hasApplicablePeriod/time:hasBeginning/time:inXSDDate ?applicablePeriodStart.} VALUES ?id { <"+cf_iri+">}  }");
-		 System.out.println("Hello");
-		 System.out.println(query);
 		     QueryExecution qExe = QueryExecutionFactory.create( query, semModel.getModel());
 	         ResultSet results = qExe.execSelect();
              
@@ -148,7 +136,7 @@ public class Utils {
 	        	list.add(map);
 	         }
 	        
-	         System.out.println(list);
+	       
 		
 		return list; 
 	}
@@ -309,6 +297,32 @@ public class Utils {
          System.out.println(list);
 	
 	return list; 
+	}
+
+	public static void executeSHACL( String payload, EmbeddedModel semModel) {
+        EmbeddedModel model = new EmbeddedModel ();
+		
+		model.getModel().read(new ByteArrayInputStream(payload.getBytes()), null, "JSON-LD");
+		
+		System.out.println(model.getModel().size());
+	
+		 
+		model.getModel().add(semModel.getModel());
+		System.out.println(model.getModel().size());
+		ResourceLoader resourceLoader = new DefaultResourceLoader();
+		Resource sh_file = resourceLoader.getResource("/sh/cf_date.ttl");
+		try {
+			model.getModel().read(sh_file.getFile().getPath());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println(model.getModel().size());
+	
+		org.apache.jena.rdf.model.Resource report = ValidationUtil.validateModel(model.getModel(), model.getModel(), true);
+		
+		System.out.println(ModelPrinter.get().print(report.getModel()));
+	 
 	}
 	
 	 

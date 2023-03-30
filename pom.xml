@@ -34,6 +34,12 @@
 		</dependency>
 		
 		<dependency>
+  <groupId>org.topbraid</groupId>
+  <artifactId>shacl</artifactId>
+  <version>1.4.2</version>
+</dependency>
+		
+		<dependency>
       <groupId>com.opencsv</groupId>
       <artifactId>opencsv</artifactId>
       <version>5.3</version>

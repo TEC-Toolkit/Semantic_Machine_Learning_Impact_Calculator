@@ -1,0 +1,43 @@
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <http://schema.org/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix  geo:  <http://www.opengis.net/ont/geosparql#>.
+@prefix  peco: <https://w3id.org/peco#>.
+@prefix  rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix  owl:  <http://www.w3.org/2002/07/owl#>.
+@prefix  ecfo: <https://w3id.org/ecfo#>.
+@prefix  xsd:  <http://www.w3.org/2001/XMLSchema#>.
+@prefix  rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix  time: <http://www.w3.org/2006/time#>.
+@prefix  dash: <https://w3id.org/shp#>.
+@prefix  prov: <http://www.w3.org/ns/prov#>.
+@prefix qudt: <https://qudt.org/schema/qudt/>.
+@prefix ex: <http://example.com/ns#> .
+
+ex:LanguageConstraintComponentUsingASK
+	a sh:ConstraintComponent ;
+	
+	rdfs:label "Language constraint component" ;
+	sh:parameter [
+		sh:path peco:EmissionScore ;
+	] ;
+	sh:labelTemplate "Conversion factor used is out of date" ;
+	sh:validator ex:hasLang .
+	
+ex:hasLang
+	a sh:SPARQLAskValidator ;
+	a sh:Validator;
+	sh:message "Conversion factor used is out of date" ;
+	sh:ask """
+	Prefix peco: <https://w3id.org/peco#>
+		    Prefix ecfo: <https://w3id.org/ecfo#>
+		    Prefix prov: <http://www.w3.org/ns/prov#>
+		    Prefix time: <http://www.w3.org/2006/time#>
+		    Prefix qudt: <https://qudt.org/schema/qudt/>
+		ASK {
+			 ?entity qudt:hasQuantityKind $this;prov:wasGeneratedBy/prov:used ?cf. ?cf ecfo:hasApplicablePeriod/time:hasEnd/time:inXSDDate ?time; rdf:value ?cf_value. Filter (?time < now()) 
+		}
+		""" .
+

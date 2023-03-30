@@ -259,8 +259,19 @@ const setDetails = (values) => {
 	 )
 	 .then ((data) => {
 		 
-		 console.log(data)
-	 document.getElementById ('provTraceEval').innerHTML = data.validity
+	 console.log(data["CF-Out-Of-Date-Violation"])
+	 console.log(data["CF-Out-Of-Date-Violation"].length)
+	 if (data["CF-Out-Of-Date-Violation"].length > 0 ) {
+		let resultString = "" 
+		
+		for (i=0;i<data["CF-Out-Of-Date-Violation"].length;i++) {
+			resultString = resultString + "Out of Date: Conversion factor with value " + data["CF-Out-Of-Date-Violation"][i].cf_value + " was valid until  " +  data["CF-Out-Of-Date-Violation"][i].time + "<br>"
+		}
+	 document.getElementById ('provTraceEval').innerHTML = resultString
+	 }
+	 else {
+		document.getElementById ('provTraceEval').innerHTML = "No constraints violations were detected"
+	}
 	 }
 	 );
   ///

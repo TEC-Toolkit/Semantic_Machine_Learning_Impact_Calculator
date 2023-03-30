@@ -76,23 +76,23 @@ import uk.ac.abdn.knowledgebase.EmbeddedModel;
 		@ResponseBody
 		public String evaluateTrace( @RequestBody String payload, Model model) {
 			
-			EmbeddedModel semModel = new EmbeddedModel ();  
+			 
 			
 			Utils.executeQueriesFromCSV (model,payload,semModel);
-			
+			//Utils.executeSHACL (payload,semModel);
 			
 			//validate GRAPH
 			
 
 			//validate if all dataresources defined in the linkage plan were also used in data selection activities
-			ArrayList <HashMap <String,String>> result = (ArrayList<HashMap<String, String>>) model.getAttribute("Q1");
+			ArrayList <HashMap <String,String>> result = (ArrayList<HashMap<String, String>>) model.getAttribute("CF-Out-Of-Date-Violation");
 			
 			
 		    Gson gson = new Gson(); 
-		    
-		    System.out.println(gson.toJson(result));
-			//return gson.toJson(result);
-		    return "{\"validity\":\"Some of the conversion factors are out of date.\"}";
+		    System.out.println("-----------------------------------------");
+		    System.out.println(gson.toJson(model));
+			return gson.toJson(model);
+		   // return "{\"validity\":\"Some of the conversion factors are out of date.\"}";
 		
 		}
 		
@@ -100,12 +100,8 @@ import uk.ac.abdn.knowledgebase.EmbeddedModel;
 		@ResponseBody
 		public String getDatatTransformations( @RequestBody String payload) {		
 			
-			ArrayList <HashMap <String,String>> result = Utils.getDatatTransformations (payload,semModel);
-			
-			
-		    Gson gson = new Gson(); 
-		    
-		    System.out.println(gson.toJson(result));
+			  ArrayList <HashMap <String,String>> result = Utils.getDatatTransformations (payload,semModel);
+		      Gson gson = new Gson(); 
 			return gson.toJson(result);
 		    
 		
