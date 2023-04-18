@@ -26,6 +26,7 @@ context.used = {"@id":prov_prefix+"used","@type": "@id"}
 context.value = {"@id":prov_prefix+"value","@type": "http://www.w3.org/2001/XMLSchema#string"}
 context.Agent = prov_prefix+"Agent";
 context.Activity = prov_prefix+"Activity";
+context.Entity = prov_prefix+"Activity";
 
 //Qudt
 context.Quantity = qudt_prefix+"Quantity";
@@ -49,10 +50,15 @@ context.targetUnit = {"@id":peco_prefix+"scope","@type": "@id"};
 context.sourceUnit = {"@id":peco_prefix+"applicableLocation","@type": "@id"};
 context.validUntil = {"@id":peco_prefix+"scope","@type": "http://www.w3.org/2001/XMLSchema#dateTime"};
 context.validFrom = {"@id":peco_prefix+"applicableLocation","@type": "http://www.w3.org/2001/XMLSchema#dateTime"};
+context.inEmissionActivityContext = {"@id":peco_prefix+"inEmissionActivityContext","@type": "@id"};
 
 //SOSA context
 context.Observation = sosa_prefix+"Observation";
 context.Sensor = sosa_prefix+"Sensor";
 context.Result = sosa_prefix+"Result";
+context.FeatureOfInterest = sosa_prefix+"FeatureOfInterest";
+context.madeBySensor = {"@id":sosa_prefix+"madeBySensor","@type": "@id"};
+context.hasFeatureOfInterest = {"@id":sosa_prefix+"hasFeatureOfInterest","@type": "@id"};
+context.hasResult = {"@id":sosa_prefix+"hasResult","@type": "@id"};
 
 

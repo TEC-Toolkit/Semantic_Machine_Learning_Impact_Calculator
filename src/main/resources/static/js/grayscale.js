@@ -1,6 +1,21 @@
 var state;
 var FEATURES = ["gpu", "provider", "region", "hours"];
+var graphLD = [];
 
+function downloadProvenanceTrace (filename) {
+    const blob = new Blob([generateJsonLDstring(graphLD)], {type: 'application/json'});
+    if(window.navigator.msSaveOrOpenBlob) {
+        window.navigator.msSaveBlob(blob, filename);
+    }
+    else{
+        const elem = window.document.createElement('a');
+        elem.href = window.URL.createObjectURL(blob);
+        elem.download = filename;        
+        document.body.appendChild(elem);
+        elem.click();        
+        document.body.removeChild(elem);
+    }
+}
 
 function getRandomInt(min, max) {
   min = Math.ceil(min);
@@ -184,23 +199,26 @@ const fillLatexTemplate = (provName, region, hours, gpu, gpuPower, emissions, of
 }
 
 const setDetails = (values) => {
-	 console.log("set detailsl called");
-  let graphLD = [];
-  console.log({ values });
+	 
   const { gpu, hours, provider, region, customImpact, customOffset, providerName } = values
   const energy = twoDigits(state.gpus[gpu].watt * hours / 1000); // kWh
   
   
   
   //record provenance of calculation --------- START
+  
+  let observation = createObservation ("https://www.wikidata.org/entity/Q5", "Observe the duration GPU was used for", "ML model training", gpu,  graphLD)
+  
   let wattConsumption = createCalculationEntity ("Watt Consumption", state.gpus[gpu].watt,"http://qudt.org/vocab/unit/W","http://www.wikidata.org/entity/Q1053879",graphLD,"")
-  let electricityUse = createCalculationEntity ("Electricity Use", hours,"http://qudt.org/vocab/unit/HR","http://www.wikidata.org/entity/Q3517751",graphLD,"")
+  let durationOfUse = createObservationResult ("Duration of Use", hours,"http://qudt.org/vocab/unit/HR","http://www.wikidata.org/entity/Q3517751",graphLD,"")
   let energyUsed = createCalculationEntity ("Energy Used", energy,"https://w3id.org/ecfo/i/kWh","http://www.wikidata.org/entity/Q12725",graphLD,"")
  
  
   let electricityUseEstimate = createCalculationActivity (null,"Estimate Electricity Use in kW/h",graphLD)
+  
+  linkResultToObservation (durationOfUse,observation,graphLD)
   linkInputEntityToActivity (wattConsumption,electricityUseEstimate,graphLD)
-  linkInputEntityToActivity (electricityUse,electricityUseEstimate,graphLD)
+  linkInputEntityToActivity (durationOfUse,electricityUseEstimate,graphLD)
   linkOutputEntityToActivity (energyUsed,electricityUseEstimate,graphLD)
   
   let emissionCalculation = createCalculationActivity (null,"Emission Calculation",graphLD)
@@ -265,7 +283,7 @@ const setDetails = (values) => {
 		let resultString = "" 
 		
 		for (i=0;i<data["CF-Out-Of-Date-Violation"].length;i++) {
-			resultString = resultString + "Out of Date: Conversion factor with value " + data["CF-Out-Of-Date-Violation"][i].cf_value + " was valid until  " +  data["CF-Out-Of-Date-Violation"][i].time + "<br>"
+			resultString = resultString + "Out of Date: The latest Emisisin conversion factor with value " + data["CF-Out-Of-Date-Violation"][i].cf_value + " was valid until  " +  data["CF-Out-Of-Date-Violation"][i].time + "<br>"
 		}
 	 document.getElementById ('provTraceEval').innerHTML = resultString
 	 }

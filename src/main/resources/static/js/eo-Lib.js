@@ -67,24 +67,54 @@ function createConversionFactor (label, value,sourceUnitIRI,targetUnitIRI, scope
 }
 
 
-function createObservationContext (agentIRI, label, graphLD) {
+function createObservation (agentIRI, observationLabel, emisisonGenerationActivityLabel, foiLabel,  graphLD) {
 	
-	let IRI = dataPrefix +"Observation/"+ uuidv4();
+	 
 	let activity = {}; 
 	
-	activity ['@id'] = IRI;
+	activity ['@id'] = dataPrefix +"Observation/"+ uuidv4();
 	activity ['@type'] = [];
 	activity ['@type'].push (context.namedIndividual);
 	activity ['@type'].push (context.Activity);
-	activity ['@type'].push (context.EmissionCalculationActivity);
+	activity ['@type'].push (context.Observation);
+	activity ['wasAssociatedWith'] =[];
 	if (agentIRI!=null) {
 		activity ['wasAssociatedWith'].push (agentIRI);
+		activity ['madeBySensor'] = agentIRI;
 	}
-	if (label!=null) {
-		activity ['label'] = label;
+	if (observationLabel!=null) {
+		activity ['label'] = observationLabel;
+	}
+	
+	
+	let emissionGenerationActivity = {}; 
+	
+	emissionGenerationActivity ['@id'] = dataPrefix +"EmissionGenerationActivity/"+ uuidv4();
+	emissionGenerationActivity ['@type'] = [];
+	emissionGenerationActivity ['@type'].push (context.namedIndividual);
+	emissionGenerationActivity ['@type'].push (context.Activity);
+	emissionGenerationActivity ['@type'].push (context.EmissionGenerationActivity);
+	if (emisisonGenerationActivityLabel!=null) {
+		emissionGenerationActivity ['label'] = emisisonGenerationActivityLabel;
+	}
+	
+	activity ['inEmissionActivityContext'] =emissionGenerationActivity ['@id'];
+	
+	
+	let foi = {}; 
+	
+	foi ['@id'] = dataPrefix +"FeatureOfInterest/"+ uuidv4();
+	foi ['@type'] = [];
+	foi ['@type'].push (context.namedIndividual);
+	foi ['@type'].push (context.Entity);
+	foi ['@type'].push (context.FeatureOfInterest);
+	if (foiLabel!=null) {
+		foi ['label'] = foiLabel;
 	}
 	
 	graphLD.push(activity);
+	graphLD.push(emissionGenerationActivity);
+	graphLD.push(foi);
 	
 	return activity ['@id'];
 }
@@ -141,7 +171,7 @@ function createCalculationEntity (label, value,unitIRI,quantityKindIRI, graphLD)
 	input ['@type'].push (context.EmissionCalculationEntity);
 	input ['@type'].push (context.Quantity);
 	input ['label']= label;
-	input ['qudt_value']= {"@value":value,"@type":"@xsd:float"};
+	input ['qudt_value']= {"@value":value,"@type":"xsd:float"};
 	
 	let unit = {}; 
 	unit ['@id'] = unitIRI;
@@ -190,6 +220,22 @@ function createCalculationActivity (agentIRI, label, graphLD) {
 }
 
 
+
+function linkResultToObservation (resultID,observationID,graphLD) {
+
+	graphLD.forEach (function (observation) {
+		if (observation['@id']=== observationID ) {
+			if (observation['hasResult'] == null) {
+			  observation['hasResult']= [];
+			  observation['hasResult'].push( resultID);
+		    }
+			else {
+				observation['hasResult'].push( resultID);
+			}
+		}
+	})
+
+}
 
 
 function linkInputEntityToActivity (entityID,activityID,graphLD) {
