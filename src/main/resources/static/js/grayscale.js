@@ -1,6 +1,6 @@
 var state;
 var FEATURES = ["gpu", "provider", "region", "hours"];
-var graphLD = [];
+var graphLD;
 
 function downloadProvenanceTrace (filename) {
     const blob = new Blob([generateJsonLDstring(graphLD)], {type: 'application/json'});
@@ -203,7 +203,7 @@ const setDetails = (values) => {
   const { gpu, hours, provider, region, customImpact, customOffset, providerName } = values
   const energy = twoDigits(state.gpus[gpu].watt * hours / 1000); // kWh
   
-  
+  graphLD = [];
   
   //record provenance of calculation --------- START
   
