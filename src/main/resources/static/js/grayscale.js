@@ -239,8 +239,11 @@ const setDetails = (values) => {
 	 )
 	 .then ((CF_data) => {
 		console.log(CF_data) 
-	const impact = twoDigits(CF_data[0].value);
+	const impact = twoDigits(CF_data[0].value.split("^")[0]);
 	const CF_IRI = CF_data[0].id
+	console.log(CF_data[0].value.split("^")[0]) 
+	console.log(impact) 
+		console.log(energy) 
 	
   
   const co2 = twoDigits(energy * impact);

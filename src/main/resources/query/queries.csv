@@ -1,1 +1,1 @@
-"CF-Out-Of-Date-Violation","Select distinct ?cf ?cf_value ?time WHERE { ?entity qudt:hasQuantityKind peco:EmissionScore;prov:wasGeneratedBy/prov:used ?cf. ?cf ecfo:hasApplicablePeriod/time:hasEnd/time:inXSDDate ?time; rdf:value ?cf_value. Filter (?time < now())}"
+"CF-Out-Of-Date-Violation","Select distinct ?cf ?cf_value ?time WHERE { ?entity qudt:hasQuantityKind peco:EmissionScore;prov:wasGeneratedBy/prov:used ?cf. SERVICE <https://cf.linkeddata.es/sparql> { ?cf ecfo:hasApplicablePeriod/time:hasEnd/time:inXSDDate ?time; rdf:value ?cf_value. Filter (?time < now())}}"

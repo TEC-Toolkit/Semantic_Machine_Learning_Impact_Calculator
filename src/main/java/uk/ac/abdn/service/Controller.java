@@ -51,58 +51,27 @@ import uk.ac.abdn.knowledgebase.EmbeddedModel;
 		 
 		EmbeddedModel semModel = new EmbeddedModel ();  
 	
+		//this will be removed once the queries are rewritten to use remote service endpoints
 		 @Autowired
 		    public void setUpKG() {
-			 ResourceLoader resourceLoader = new DefaultResourceLoader();
-			 Resource conversion_factors_kg_ml = resourceLoader.getResource("/data/ml_calculator.ttl");
-			 Resource conversion_factors_kg = resourceLoader.getResource("/data/cf_2021.ttl");
-			 Resource conversion_factors_kg2 = resourceLoader.getResource("/data/cf_2022.ttl");
-			 Resource conversion_factors_kg3 = resourceLoader.getResource("/data/cf_2020.ttl");
-			 Resource conversion_factors_kg4 = resourceLoader.getResource("/data/cf_2019.ttl");
-			 Resource conversion_factors_kg5 = resourceLoader.getResource("/data/cf_2018.ttl");
-			 Resource conversion_factors_kg6 = resourceLoader.getResource("/data/cf_2017.ttl");
-			 Resource conversion_factors_kg7 = resourceLoader.getResource("/data/cf_2016.ttl");
-			 try {
-					semModel.loadData(conversion_factors_kg.getFile().getPath());
-					semModel.loadData(conversion_factors_kg_ml.getFile().getPath());
-					semModel.loadData(conversion_factors_kg2.getFile().getPath());
-					semModel.loadData(conversion_factors_kg3.getFile().getPath());
-					semModel.loadData(conversion_factors_kg4.getFile().getPath());
-					semModel.loadData(conversion_factors_kg5.getFile().getPath());
-					semModel.loadData(conversion_factors_kg6.getFile().getPath());
-					semModel.loadData(conversion_factors_kg7.getFile().getPath());
-					semModel.getModel().read("https://qudt.org/vocab/unit/");
-					semModel.getModel().read("https://tec-toolkit.github.io/PECO/release/0.0.1/ontology.ttl");
-					semModel.getModel().read("https://tec-toolkit.github.io/ECFO/release/0.0.1/ontology.ttl");
-				} catch (IOException e2) {
-					// TODO Auto-generated catch block
-					e2.printStackTrace();
-				}
+			 
+			semModel.getModel().read("https://qudt.org/vocab/unit/");
+			semModel.getModel().read("https://tec-toolkit.github.io/PECO/release/0.0.1/ontology.ttl");
+			semModel.getModel().read("https://tec-toolkit.github.io/ECFO/release/0.0.1/ontology.ttl");
 		    }
 		
 		
-		@CrossOrigin(origins = "*")
+	
 		@PostMapping("/evaluateTrace")
 		@ResponseBody
 		public String evaluateTrace( @RequestBody String payload, Model model) {
 			
-			 
-			
 			Utils.executeQueriesFromCSV (model,payload,semModel);
-			//Utils.executeSHACL (payload,semModel);
-			
-			//validate GRAPH
-			
-
-			//validate if all dataresources defined in the linkage plan were also used in data selection activities
-			ArrayList <HashMap <String,String>> result = (ArrayList<HashMap<String, String>>) model.getAttribute("CF-Out-Of-Date-Violation");
-			
-			
 		    Gson gson = new Gson(); 
 		    System.out.println("-----------------------------------------");
 		    System.out.println(gson.toJson(model));
 			return gson.toJson(model);
-		   // return "{\"validity\":\"Some of the conversion factors are out of date.\"}";
+		  
 		
 		}
 		
@@ -126,14 +95,6 @@ import uk.ac.abdn.knowledgebase.EmbeddedModel;
 
 		}
 		
-		@GetMapping("/get_CF")
-		public String get_CF( @RequestParam String providerName, @RequestParam String region) {
-			
-			
-		    Gson gson = new Gson(); 
-			return gson.toJson(	Utils.getCF_For_Provider_Region (providerName,region,semModel));
-
-		}
 		
 		@GetMapping("/cf_info_all")
 		public String cf_info_alternative( @RequestParam String region) {
