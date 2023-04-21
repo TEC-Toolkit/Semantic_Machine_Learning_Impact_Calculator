@@ -35,7 +35,7 @@ server:
 ## How to Run
 
 ````
-git clone  https://github.com/TEC-Toolkit/SemanticMLCalculatorValidationService.git
+git clone  https://github.com/TEC-Toolkit/Semantic_Machine_Learning_Impact_Calculator.git
 ````
 
 then cd into the project directory and run 
