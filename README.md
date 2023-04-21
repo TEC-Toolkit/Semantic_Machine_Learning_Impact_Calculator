@@ -18,6 +18,15 @@ The following online resources must be available for the app to work:
 
 - https://tec-toolkit.github.io/ECFO/release/0.0.1/ontology.ttl
 
+## Config
+
+Application is set to run on port 8080 by default. To change the default port edit teh port entry in  application.yml 
+
+````
+server:
+  port : 8080
+````
+
 ## How to Run
 
 ````
