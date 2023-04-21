@@ -1,4 +1,4 @@
-package uk.ac.abdn.knowledgebase;
+package io.github.tectoolkit.calculator;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;

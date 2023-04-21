@@ -14,13 +14,13 @@ var  eoPrefix =  "https://w3id.org/okn/o/eo#";
 
   function simplifyGraph (garaphObj) {
   	
-	  let newGraph = {};
-	  
-	  
-	  
+	  let newGraph = {};  
 	  return newGraph;
   }
 
+function removeLiteralType (stringValue) {
+	 return	 stringValue.split("^")[0];
+}
 
 function generateJsonLDstring (graphLD) {
 	

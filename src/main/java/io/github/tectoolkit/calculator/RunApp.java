@@ -1,13 +1,13 @@
-package uk.ac.abdn.service;
+package io.github.tectoolkit.calculator;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class QueryService {
+public class RunApp {
 
 	public static void main(String[] args) {
-		SpringApplication.run(QueryService.class, args);
+		SpringApplication.run(RunApp.class, args);
 	}
 
 }
