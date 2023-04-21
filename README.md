@@ -4,13 +4,12 @@
 
 Thsi calculator has been derived from the code published by the <a href="https://github.com/mlco2/impact">Machine Learning's CO2 Impact</a> project
 
-##Prerequisite
 
-# JAVA Version
+## JAVA Version
 
 Minimum JAVA 8 is required to run this project. 
 
-# External Dependencies
+## External Dependencies
 
 The following online resources must be available for the app to work: 
 
