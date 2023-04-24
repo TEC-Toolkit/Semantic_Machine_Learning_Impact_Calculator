@@ -299,7 +299,10 @@ const setDetails = (values) => {
 						document.getElementById('provTraceEval').innerHTML = "No constraints violations were detected"
 					}
 				}
-				);
+				)
+				 .catch(function(error) {                        // catch
+     alert ("The calcualtor could not evaluate the calculation provenance trace. ");
+  });
 			///
 
 			// PRINT TRANSFORMATIONS TABLE
@@ -373,7 +376,10 @@ const setDetails = (values) => {
 					let table_body = document.getElementById('data_transformations_table_body');
 					table_body.innerHTML = html_string;
 				}
-				);
+				)
+						 .catch(function(error) {                        // catch
+     alert ("The calcualtor could not retrieve the calculation provenance trace. ");
+  });
 			///
 
 
@@ -442,6 +448,9 @@ const setDetails = (values) => {
 			//end first fetch()
 		}
 		)
+		.catch(function(error) {                        // catch
+     alert ("The calcualtor could not retrieve the Conversion Factor data from the remote endpoint. ");
+  });
 }
 
 const scientificNotation = (n, d) => {
