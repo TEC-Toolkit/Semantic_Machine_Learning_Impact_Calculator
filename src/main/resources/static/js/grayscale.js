@@ -233,12 +233,17 @@ const setDetails = (values) => {
 
 
 	// const impact = Number.isFinite(customImpact) ? customImpact : twoDigits(state.providers[provider][region].impact / 1000); // kg/kwH
-	fetch('http://localhost:8080/cf_info_all?region=' + region)
+	fetch('/cf_info_all?region=' + region)
 		.then((response) =>
 			response.json()
 		)
 		.then((CF_data) => {
 			console.log(CF_data)
+			if (!CF_data[0].value) {
+				alert ("Sorry we could not retrieve Conversion Factor matching this location.")
+				
+			}
+			
 			const impact = twoDigits(removeLiteralType(CF_data[0].value));
 			const CF_IRI = CF_data[0].id
 
@@ -265,7 +270,7 @@ const setDetails = (values) => {
 			//CHECK THE GRAPH 
 
 
-			fetch('http://localhost:8080/evaluateTrace', {
+			fetch('/evaluateTrace', {
 				method: 'POST',
 				mode: "cors", // no-cors, *cors, same-origin
 				body: generateJsonLDstring(graphLD)
@@ -298,7 +303,7 @@ const setDetails = (values) => {
 			///
 
 			// PRINT TRANSFORMATIONS TABLE
-			fetch('http://localhost:8080/getDataTransformations', {
+			fetch('/getDataTransformations', {
 				method: 'POST',
 				mode: "cors", // no-cors, *cors, same-origin
 				body: generateJsonLDstring(graphLD)
@@ -326,10 +331,10 @@ const setDetails = (values) => {
 					for (var prop in list) {
 						for (i = 0; i < data.length; i++) {
 							if (data[i].activityLabel == prop) {
-								let input = data[i].inputLabel + " (v:" + removeLiteralType(data[i].inputValue) + ", unit: " + data[i].inputUnitLabel + ", type: " + data[i].inputQuantityKindL + ")<hr>"
+								let input = data[i].inputLabel + " <br> " + removeLiteralType(data[i].inputValue) + " (" + removeLiteralType(data[i].inputUnitLabel) + "), [ " + removeLiteralType(data[i].inputQuantityKindL) + "]<hr>"
 								list[prop]["input"].push(input);
 
-								let output = data[i].outputLabel + " (v:" + removeLiteralType(data[i].outputValue) + ", unit: " + data[i].outputUnitLabel + ", type: " + data[i].outputQuantityKindL + ")<hr>"
+								let output = data[i].outputLabel + "<br> " + removeLiteralType(data[i].outputValue) + ", (" + removeLiteralType(data[i].outputUnitLabel) + "), [ " + removeLiteralType(data[i].outputQuantityKindL) + "]<hr>"
 								if (!list[prop]["output"].includes(output)) {
 
 									list[prop]["output"].push(output);
@@ -389,21 +394,21 @@ const setDetails = (values) => {
 					html_string = html_string + "<tr>"
 				}
 
-				html_string = html_string + "<td>" + CF_data[i].sourceUnit + "</td>"
-				html_string = html_string + "<td>" + CF_data[i].targetUnit + "</td>"
+				html_string = html_string + "<td>" + removeLiteralType(CF_data[i].sourceUnit) + "</td>"
+				html_string = html_string + "<td>" + removeLiteralType(CF_data[i].targetUnit) + "</td>"
 
-				html_string = html_string + "<td>" + CF_data[i].applicablePeriodStart + "</td>"
-				html_string = html_string + "<td>" + CF_data[i].applicablePeriodEnd + "</td>"
-				html_string = html_string + "<td>" + CF_data[i].applicableLocation + "</td>"
-
-
-
-				html_string = html_string + "<td>" + CF_data[i].value + "</td>"
+				html_string = html_string + "<td>" + removeLiteralType(CF_data[i].applicablePeriodStart) + "</td>"
+				html_string = html_string + "<td>" + removeLiteralType(CF_data[i].applicablePeriodEnd) + "</td>"
+				html_string = html_string + "<td>" + removeLiteralType(CF_data[i].applicableLocation) + "</td>"
 
 
 
+				html_string = html_string + "<td>" + removeLiteralType(CF_data[i].value) + "</td>"
+
+
+                html_string = html_string + "<td><a href=\"" + CF_data[i].id + "\">link</a></td>"
 				html_string = html_string + "<td><a href=\"" + CF_data[i].source + "\">link</a></td>"
-				html_string = html_string + "<td><a href=\"" + CF_data[i].id + "\">link</a></td>"
+				
 				html_string = html_string + "<td>" + twoDigits(energy * twoDigits(CF_data[i].value.split("^")[0])) + "(" + CF_data[i].targetUnit + ")</td>"
 				html_string = html_string + "</tr>"
 
@@ -418,98 +423,22 @@ const setDetails = (values) => {
 
 
 
-			//CF Table enf
-			/* 
-			   //CF Alternative Table start
-			 fetch('http://localhost:8080/cf_info_alternative_electricity?region='+region )
-				.then ((response) => 
-					response.json()
-				)
-				.then ((data) => {
-		   
-				let html_string = "";
-			    
-				for (i=0;i<data.length;i++) {
-				html_string = html_string + "<tr>"
-				html_string = html_string + "<td>"+data[i].id+"</td>"
-			    
-				html_string = html_string + "<td>"+data[i].applicableLocation+"</td>"
-			    
-				html_string = html_string + "<td>"+data[i].sourceUnit+"</td>"
-				html_string = html_string + "<td>"+data[i].targetUnit+"</td>"
-				html_string = html_string + "<td>"+data[i].applicablePeriodStart+"</td>"
-				 html_string = html_string + "<td>"+data[i].applicablePeriodEnd+"</td>"
-				 html_string = html_string + "<td>"+data[i].value+"</td>"
-				  html_string = html_string + "<td>"+data[i].source+"</td>"
-				html_string =html_string + "</tr>"
-			    
-			    
-			    
-				}
-				if (html_string.length===0) {
-				   html_string = '<tr><td colspan="8"> No Data Available</td> </tr>'
-			   }
-				 console.log(html_string)
-				let table_body = document.getElementById('cf_table_body_alternative');
-				table_body.innerHTML = html_string;
-			    
-				//assumption there is aonly one alternative suggestion
-			    
-			   if (data[0]!=null) {
-				let score_alternative = data[0].value*energy;
-				document.getElementById('alternative_text').innerHTML='<span style="color:red;">The emission score calculated using this factor would be <strong>' +score_alternative +'</strong></span>';
-			   }
-				}
-				)
-			   //CF Alternative Table enf
-		   */
+		
 			console.log(graph_ld_object);
 			$('#graph').empty();
 			// d3.jsonldVis(graph_ld_object, '#graph', {  maxLabelWidth: 550 });
 
-			const offset = Number.isFinite(customOffset) ? twoDigits(co2 * customOffset / 100) : twoDigits(co2 * state.providers[provider][region].offsetRatio / 100)
-			const offsetPercents = Number.isFinite(customOffset) ? twoDigits(customOffset) : twoDigits(state.providers[provider][region].offsetRatio)
-			const provName = Number.isFinite(customOffset) ? "" : state.providers[provider][region].providerName;
-			const minRegId = Number.isFinite(customOffset) ? "" : state.providers[provider].__min.region;
-			const minReg = Number.isFinite(customOffset) ? "" : state.providers[provider][minRegId];
-
-			fillLatexTemplate(provName, region, hours, gpu, state.gpus[gpu].watt, co2, offsetPercents, impact)
+			
+			
 			fillComparisonTable(co2);
 
-			$("#comparison-result-co2").text(co2);
-			$("#offset-value").text(offset);
+			//$("#comparison-result-co2").text(co2);
+			
 			$("#details-counts").html(`
   ${state.gpus[gpu].watt}W x ${hours}h = <strong>${energy} kWh</strong> x ${impact}
   kg  eq. CO<sub>2</sub>/kWh = <strong>${co2} kg eq. CO<sub>2</sub></strong>
   `);
-			if (Number.isFinite(customOffset)) {
-
-				$("#details-min-region").html("");
-				$("#details-alternative").html("");
-				$("#details-alternative-content").show();
-				$("#compute-carbon-offset-title").html("Carbon offset");
-			} else {
-				$("#compute-carbon-offset-title").html("Carbon Already Offset by Provider")
-				if (region !== minRegId) {
-					const minco2 = twoDigits(energy * minReg.impact / 1000);
-					$("#details-min-selected").hide()
-					$("#details-alternative").html(
-						`
-        Had this model been run in ${provName}'s <strong>${minReg.regionName}</strong> region,
-        the carbon emitted would have been of <strong>${minco2}</strong> kg eq. CO<sub>2</sub>
-        `
-					)
-					$("#details-alternative").show()
-				} else {
-					$("#details-min-selected").show()
-					$("#details-alternative").hide()
-					$("#details-min-region").html(
-						`
-        You have selected ${provName}'s cleanest region!
-        `
-					)
-				}
-			}
+		
 			//end first fetch()
 		}
 		)
@@ -649,7 +578,7 @@ const setInputs = () => {
 			$("#compute-provider").append(`<option value="${provider}">${providerName}</option>`)
 		}
 	}
-	$("#compute-provider").append(`<option value="custom">Private Infrastructure</option>`)
+	
 	setRegions(prov)
 }
 
@@ -766,33 +695,11 @@ const setInputs = () => {
 
 	// $("#details-featured-maps").click()
 
-	// const response = await fetch("https://api.co2signal.com/v1/latest?lon=6.8770394&lat=45.9162776", {
-	//   credentials: "include",
-	//   headers: {
-	//     'Content-Type': 'application/jsonp',
-	//     'auth-token': 'c5f38468eddd9edb'
-	//   }
-	// })
-	// console.log({ response });
 
-	$("#copy-template-btn").click(() => {
-		selectAndCopyText("template-code");
-		$("#copy-template-feedback").fadeIn(() => {
-			setTimeout(
-				() => {
-					$("#copy-template-feedback").fadeOut()
-				}, 1000);
-		})
-	})
 
-	// const response = await fetch("https://api.co2signal.com/v1/latest?lon=6.8770394&lat=45.9162776", {
-	//   credentials: "include",
-	//   headers: {
-	//     'Content-Type': 'application/jsonp',
-	//     'auth-token': 'c5f38468eddd9edb'
-	//   }
-	// })
-	// console.log({ response });
+	
+
+	
 
 
 })(jQuery); // End of use strict

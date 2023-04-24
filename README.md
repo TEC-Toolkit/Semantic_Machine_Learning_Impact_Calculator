@@ -29,7 +29,7 @@ Application is set to run on port 8080 by default. To change the default port ed
 
 ````
 server:
-  port : 8080
+  port : 3000
 ````
 
 ## How to Run
@@ -44,4 +44,4 @@ then cd into the project directory and run
 mvn spring-boot:run
 ````
 
-Go to localhost:8080 and you should see the landing page of the Calculator
+Go to localhost:3000 and you should see the landing page of the Calculator

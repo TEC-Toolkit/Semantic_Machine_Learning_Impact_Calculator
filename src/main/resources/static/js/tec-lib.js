@@ -19,7 +19,12 @@ var  eoPrefix =  "https://w3id.org/okn/o/eo#";
   }
 
 function removeLiteralType (stringValue) {
-	 return	 stringValue.split("^")[0];
+	 if (stringValue) {
+	 return	 stringValue.split("^")[0].split("@")[0];
+	 } 
+	 else {
+		return "no value";
+	}
 }
 
 function generateJsonLDstring (graphLD) {
