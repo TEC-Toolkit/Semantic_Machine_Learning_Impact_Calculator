@@ -1,13 +1,18 @@
 package io.github.tectoolkit.calculator;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+
+import org.apache.commons.io.IOUtils;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.query.Dataset;
@@ -92,22 +97,47 @@ public class SPARQLQueries {
 
 	}
 
-	public static ArrayList<HashMap<String, String>> getCFInfo(String cf_iri, OntModel semModel) {
+	public static String getCFInfo(String cf_iri) {
 
 		ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
-
+/*
 		Query query = QueryFactory.create(Constants.PREFIXES
-				+ " Select distinct ?id ?sourceUnit ?targetUnit ?source ?value ?applicableLocation ?applicablePeriodStart ?applicablePeriodEnd "
+				+ " Select distinct ?id ?sourceUnit ?targetUnit ?source ?value ?emissionTarget ?emissionSource ?applicableLocation ?applicablePeriodStart ?applicablePeriodEnd "
 				+ "WHERE { " + "SERVICE " + Constants.CF_ENDPOINT + " " + "{ ?id a ecfo:EmissionConversionFactor. "
-				+ "OPTIONAL {?id ecfo:sourceUnit/rdfs:label ?sourceUnit.} "
-				+ "OPTIONAL {?id ecfo:targetUnit/rdfs:label ?targetUnit.} "
+				+ "OPTIONAL {?id ecfo:hasSourceUnit/rdfs:label ?sourceUnit.} "
+				+ "OPTIONAL {?id ecfo:hasTargetUnit/rdfs:label ?targetUnit.} "
+				+ "OPTIONAL {?id ecfo:hasEmissionTarget ?emissionTarget.} "
+				+ "OPTIONAL {?id ecfo:hasEmissionSource ?emissionSource.} "
 				+ "OPTIONAL {?id prov:wasDerivedFrom ?source.} " + "OPTIONAL {?id rdf:value ?value.} "
 				+ "OPTIONAL {?id ecfo:hasApplicableLocation ?loc. ?loc rdfs:label ?applicableLocation. } "
 				+ "OPTIONAL {?id ecfo:hasApplicablePeriod/time:hasEnd/time:inXSDDate ?applicablePeriodEnd.} "
 				+ "OPTIONAL {?id ecfo:hasApplicablePeriod/time:hasBeginning/time:inXSDDate ?applicablePeriodStart.}} "
 				+ "VALUES ?id { <" + cf_iri + ">}  }");
-
-		QueryExecution qExe = QueryExecutionFactory.create(query);
+*/
+		Query query = QueryFactory.create(Constants.PREFIXES
+				+"Construct {\n" + 
+				"    ?id ?p ?o.\n" + 
+				"    ?o2 ?p3 ?o3.\n" + 
+				"    ?o3 ?p4 ?o4.\n" + 
+				"}\n" + 
+				"\n" + 
+				"Where {\n" + 
+			
+				"        ?id ?p ?o.\n" + 
+				"        Optional {\n" + 
+				"        ?id ecfo:hasApplicablePeriod ?o2.\n" + 
+				"            ?o2 ?p3 ?o3.\n" + 
+				"            ?o3 ?p4 ?o4.\n" + 
+				"    }\n" + 
+				"    Values ?id {<"+cf_iri+">}\n" + 
+				"}");
+		QueryExecution qExe = QueryExecution.service(Constants.CF_ENDPOINT_URL).query(query).build();
+		org.apache.jena.rdf.model.Model results = qExe.execConstruct();
+		
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		PrintStream ps = new PrintStream(baos);
+		results.write(ps, "JSON-LD");
+		/*
 
 		ResultSet results = qExe.execSelect();
 
@@ -122,7 +152,14 @@ public class SPARQLQueries {
 
 			list.add(map);
 		}
+		
 		return list;
+		
+		*/
+		String result = baos.toString();
+		ps.flush();
+		return result;
+		
 	}
 
 	public static ArrayList<HashMap<String, String>> getCFInfo_All(String region, OntModel semModel) {
@@ -130,37 +167,65 @@ public class SPARQLQueries {
 		ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
 
 		Query query = QueryFactory.create(Constants.PREFIXES
-				+ " SELECT DISTINCT  ?id ?sourceUnit ?targetUnit ?source ?value ?applicableLocation ?applicablePeriodStart ?applicablePeriodEnd\n"
-				+ "WHERE\n" + "  { \n" + " SERVICE " + Constants.CF_ENDPOINT + " {\n"
-				+ "    ?id rdf:type ecfo:EmissionConversionFactor; ecfo:targetUnit/rdfs:label \"kg CO2e\". \n"
-				+ "    {\n" + "    ?id  ecfo:hasApplicableLocation/rdfs:label  \"" + region + "\".\n" + "    }\n"
-				+ "    UNION \n" + "    {\n" + "    ?id  ecfo:hasApplicableLocation/geo:ehContains/rdfs:label \""
-				+ region + "\";\n"
-				+ "                                                  ecfo:hasTag           <https://w3id.org/ecfo/i/Electricity%3A%20UK> ,                                       <https://w3id.org/ecfo/i/Electricity%20generated>,<https://w3id.org/ecfo/i/UK%20electricity> . \n"
-				+ "    }        \n" + "    OPTIONAL\n" + "      { ?id ecfo:hasApplicableLocation ?location }\n"
-				+ "    OPTIONAL\n" + "      { ?id ecfo:sourceUnit/rdfs:label ?sourceUnit }\n" + "    OPTIONAL\n"
-				+ "      { ?id ecfo:hasApplicablePeriod/time:hasBeginning/time:inXSDDate ?applicablePeriodStart }\n"
-				+ "    OPTIONAL\n"
-				+ "      { ?id ecfo:hasApplicablePeriod/time:hasEnd/time:inXSDDate ?applicablePeriodEnd }\n"
-				+ "    OPTIONAL\n" + "      { ?id  ecfo:targetUnit/rdfs:label  ?targetUnit }\n" + "    OPTIONAL\n"
-				+ "      { ?id  prov:wasDerivedFrom  ?source }\n" + "    OPTIONAL\n"
-				+ "      { ?id  rdf:value  ?value }\n"
-
-				+ "    Optional {\n" + "        ?location rdfs:label ?locationLabel.\n" + "    }}\n" + "OPTIONAL {\n"
-				+ "        SERVICE " + Constants.WikiData_ENDPOINT + " {     \n"
-				+ "             ?location rdfs:label ?wikilocationLabel.\n"
-				+ "             FILTER (LANG(?wikilocationLabel) = \"en\")\n" + "        }\n" + "    }\n"
-				+ "    bind(if(bound(?locationLabel) , ?locationLabel,?wikilocationLabel) as ?applicableLocation)"
-
-				+ "  } ORDER BY DESC(?applicablePeriodEnd)");
+				+ "  SELECT DISTINCT  ?id ?sourceUnit ?targetUnit ?source ?value ?applicableLocation ?applicablePeriodStart ?applicablePeriodEnd \n" + 
+				"WHERE\n" + 
+			
+				"      { ?id  rdf:type  ecfo:EmissionConversionFactor .\n" + 
+				"        ?id ecfo:hasTargetUnit ?targetUnitInst.\n" + 
+				"            ?targetUnitInst    rdfs:label \"kilogram\"\n" + 
+				"          { ?id ecfo:hasApplicableLocation/rdfs:label \""+region+"\" }\n" + 
+				"        UNION\n" + 
+				"        { \n" + 
+				"            ?id (ecfo:hasApplicableLocation/geo:ehContains)/rdfs:label \""+region+"\" .\n" + 
+				"            ?id  ecfo:hasScope ecfo:Scope2.\n" + 
+				"            ?id ecfo:hasEmissionSource <https://w3id.org/ecfkg/i/Electricity_generated_Electricity_UK>. \n" + 
+				"             ?id ecfo:hasTargetUnit ?targetUnitInst.\n" + 
+				"             ?targetUnitInst    rdfs:label \"kilogram\".\n" + 
+				"            ?id ecfo:hasEmissionTarget <http://www.wikidata.org/entity/Q1933140>.         \n" + 
+				"          }\n" + 
+				"         OPTIONAL\n" + 
+				"        {?id ecfo:hasSourceUnit ?sourceUnitInst.}\n" + 
+				"        \n" + 
+				"        OPTIONAL\n" + 
+				"          { ?id  ecfo:hasApplicableLocation  ?location }\n" + 
+				"        \n" + 
+				"        OPTIONAL\n" + 
+				"          { ?id (ecfo:hasApplicablePeriod/time:hasBeginning)/time:inXSDDate ?applicablePeriodStart }\n" + 
+				"        OPTIONAL\n" + 
+				"          { ?id (ecfo:hasApplicablePeriod/time:hasEnd)/time:inXSDDate ?applicablePeriodEnd }\n" + 
+				"        \n" + 
+				"        OPTIONAL\n" + 
+				"          { ?id  prov:wasDerivedFrom  ?source }\n" + 
+				"        OPTIONAL\n" + 
+				"          { ?id  rdf:value  ?value }\n" + 
+				"        OPTIONAL\n" + 
+				"          { ?location  rdfs:label  ?locationLabel }\n" + 
+			
+				
+				"       OPTIONAL\n" + 
+				"          {\n" + 
+				"       ?location  rdfs:label  ?wikilocationLabel\n" + 
+				"            FILTER ( lang(?wikilocationLabel) = \"en\" )\n" + 
+				"        }   \n" + 
+				"        Optional {\n" + 
+				"             ?targetUnitInst  qudt:symbol  ?targetUnit.\n" + 
+				"        }\n" + 
+				"        Optional {\n" + 
+				"             ?sourceUnitInst  qudt:symbol  ?sourceUnit.\n" + 
+		 
+				"      }\n" + 
+				"    BIND(if(bound(?locationLabel), ?locationLabel, ?wikilocationLabel) AS ?applicableLocation)\n" + 
+				"  }\n" + 
+				"ORDER BY DESC(?applicablePeriodEnd)");
 
 		System.out.println("Emission Conversion Factor Query");
 		System.out.println(query);
 
 		// having only SPARQL query with two Service parts doesn't work if at least an
 		// empy model isn't passed as well - weird...
-		QueryExecution qExe = QueryExecutionFactory.create(query, ModelFactory.createOntologyModel(OntModelSpec.RDFS_MEM_RDFS_INF));
-
+		//QueryExecution qExe = QueryExecutionFactory.create(query, ModelFactory.createOntologyModel(OntModelSpec.RDFS_MEM_RDFS_INF));
+		QueryExecution qExe = QueryExecution.service(Constants.CF_ENDPOINT_URL).query(query).build();
+		
 		ResultSet results = qExe.execSelect();
 
 		while (results.hasNext()) {
@@ -188,38 +253,54 @@ public class SPARQLQueries {
 		ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
 
 		Query query = QueryFactory.create(Constants.PREFIXES
-				+ " SELECT DISTINCT  ?activityLabel ?inputLabel ?inputValue ?inputUnitLabel ?inputQuantityKindL ?outputLabel ?outputValue ?outputUnitLabel  ?outputQuantityKindL  \n"
-				+ "WHERE\n" + "  { ?activity  rdf:type   peco:EmissionCalculationActivity ;\n"
-				+ "              rdfs:label  ?activityLabel; prov:used ?input.\n" + "    {\n"
-				+ "    ?input a peco:EmissionCalculationEntity; rdfs:label ?inputLabel; qudt:value ?inputValue;qudt:hasQuantityKind ?inputQuantityKind; qudt:unit ?inputUnit.\n"
-				+ "    Optional {\n" + "        SERVICE "+Constants.CF_ENDPOINT+"\n"
-				+ "          { ?inputUnit rdfs:label ?inputUnitLabel }\n" + "        }\n" + "         Optional {\n"
-				+ "        ?inputUnit rdfs:label ?inputUnitLabel. \n" + "        }"
-
-				+ "     OPTIONAL {\n" + "        SERVICE " + Constants.WikiData_ENDPOINT + " {     \n"
-				+ "             ?inputQuantityKind rdfs:label ?inputQuantityKindL.\n"
-				+ "             FILTER (LANG(?inputQuantityKindL) = \"en\")\n" + "        }\n" + "        }\n"
-				+ "    }\n" + "    "
-						+ "Union\n" + "    {\n"
-
-				+ "       SERVICE " + Constants.CF_ENDPOINT + " {"
-				+ "      ?input  rdf:value ?inputValue; ecfo:targetUnit/rdfs:label ?inputUnitLabel.\n"
-				+ "}" + "ecfo:EmissionConversionFactor rdfs:label ?inputQuantityKindL,?inputLabel." + "    }\n" + "    \n"
-				+ "    ?output a peco:EmissionCalculationEntity; prov:wasGeneratedBy ?activity; rdfs:label ?outputLabel; qudt:value ?outputValue; qudt:hasQuantityKind "
-				+ "    ?outputQuantityKind; qudt:unit ?outputUnit.\n" + "    SERVICE " + Constants.CF_ENDPOINT
-				+ " { ?outputUnit rdfs:label ?outputUnitLabel} " + "   \n" + "  \n" + "    OPTIONAL {\n"
-				+ "        SERVICE " + Constants.WikiData_ENDPOINT + " {     \n"
-				+ "             ?outputQuantityKind rdfs:label ?wikiOutputQuantityKindLabel.\n"
-				+ "             FILTER (LANG(?wikiOutputQuantityKindLabel) = \"en\")\n" + "        }\n" + "    }\n"
-				+ "    OPTIONAL\n" + "      { ?outputQuantityKind  rdfs:label  ?outputQuantityKindLabel }\n"
-				+ "    BIND(if(bound(?outputQuantityKindLabel), ?outputQuantityKindLabel, ?wikiOutputQuantityKindLabel) AS ?outputQuantityKindL)\n"
-				+ "  }\n" + " ");
+				+ " SELECT DISTINCT  ?activityLabel ?inputLabel   ?inputValue ?inputUnitLabel ?inputQuantityKindL ?outputLabel ?outputValue  ?outputUnitLabel ?outputQuantityKindL\n" + 
+				"WHERE\n" + 
+				"  { ?activity  rdf:type   peco:EmissionCalculationActivity ;\n" + 
+				"              rdfs:label  ?activityLabel ;\n" + 
+				"              prov:used   ?input\n" + 
+				"      { ?input  rdf:type              peco:EmissionCalculationEntity ;\n" + 
+				"                rdfs:label            ?inputLabel ;\n" + 
+				"                qudt:value            ?inputValue ;\n" + 
+				"                qudt:hasQuantityKind  ?inputQuantityKind ;\n" + 
+				"                qudt:unit             ?inputUnit.\n" + 
+				"            ?inputUnit  rdfs:label  ?inputUnitLabel.  \n" + 
+				"            ?inputQuantityKind rdfs:label  ?inputQuantityKindL.\n" + 
+				"             FILTER ( lang(?inputUnitLabel) = \"en\" )\n" + 
+				"          }\n" + 
+				"     \n" + 
+				"    UNION\n" + 
+				"     \n" + 
+				"          { ?input  rdf:value  ?inputValue .\n" + 
+				"            ?input ecfo:hasTargetUnit/qudt:symbol ?inputUnitLabel .\n" + 
+				"            ?input ecfo:hasEmissionTarget/rdfs:label ?inputQuantityKindL.\n" + 
+				"            ecfo:EmissionConversionFactor rdfs:label ?inputLabel.\n" + 
+				"            FILTER ( lang(?inputQuantityKindL) = \"en\" )\n" + 
+				"          }\n" + 
+				"        \n" + 
+				"     \n" + 
+				"    ?output  rdf:type              peco:EmissionCalculationEntity ;\n" + 
+				"             prov:wasGeneratedBy   ?activity ;\n" + 
+				"             rdfs:label            ?outputLabel ;\n" + 
+				"             qudt:value            ?outputValue ;\n" + 
+				"             qudt:hasQuantityKind  ?outputQuantityKind ;\n" + 
+				"             qudt:unit             ?outputUnit\n" + 
+				"    OPTIONAL\n" + 
+				"          { ?outputUnit  qudt:symbol  ?outputUnitLabel\n" + 
+				"            FILTER ( lang(?outputUnitLabel) = \"en\" )\n" + 
+				"          }\n" + 
+				"        OPTIONAL\n" + 
+				"          { ?outputQuantityKind\n" + 
+				"                      rdfs:label  ?outputQuantityKindL\n" + 
+				"          }\n" + 
+				"     \n" + 
+				"  } ");
 
 		System.out.println("----------------------");
 		System.out.println("Provenance Trace Query");
 		System.out.println("----------------------");
 		System.out.println(query);
 		QueryExecution qExe = QueryExecutionFactory.create(query, model);
+		System.out.println("Executing Provenance Trace Query");
 		ResultSet results = qExe.execSelect();
 
 		while (results.hasNext()) {

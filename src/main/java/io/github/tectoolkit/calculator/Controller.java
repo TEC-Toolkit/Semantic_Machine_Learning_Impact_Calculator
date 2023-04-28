@@ -5,7 +5,10 @@ import java.util.HashMap;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.ModelFactory;
+import  org.springframework.core.io.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,6 +27,7 @@ public class Controller {
 
 	@Autowired
 	public void setUpKG() {
+		
 
 		semModel = ModelFactory.createOntologyModel(OntModelSpec.RDFS_MEM_RDFS_INF);
 
@@ -31,6 +35,7 @@ public class Controller {
 		semModel.read(Constants.QUDT_UNITS);
 		semModel.read(Constants.ECFO);
 		semModel.read(Constants.PECO);
+		semModel.read(Constants.WIKIDATA_LABELS,"Turtle");
 	}
 
 	@PostMapping("/evaluateTrace")
@@ -58,8 +63,8 @@ public class Controller {
 	@GetMapping("/cf_info")
 	public String cf_info(@RequestParam String cf_iri) {
 
-		Gson gson = new Gson();
-		return gson.toJson(SPARQLQueries.getCFInfo(cf_iri, semModel));
+		
+		return SPARQLQueries.getCFInfo(cf_iri);
 
 	}
 

@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Primary Meta Tags -->
+  <title>Machine Learning CO2 Impact Calculator</title>
+  <meta name="title" content="Machine Learning CO2 Impact Calculator">
+  <meta name="description"
+    content="Machine Learning has in impact on our climate. Here's how to estimate your GPU's carbon emissions">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://mlco2.github.io/impact">
+  <meta property="og:title" content="Machine Learning CO2 Impact Calculator">
+  <meta property="og:description"
+    content="Machine Learning has in impact on our climate. Here's how to estimate your GPU's carbon emissions">
+  <meta property="og:image" content="https://raw.githubusercontent.com/mlco2/impact/master/img/thumbnail.png">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://mlco2.github.io/impact">
+  <meta property="twitter:title" content="Machine Learning CO2 Impact Calculator">
+  <meta property="twitter:description"
+    content="Machine Learning has in impact on our climate. Here's how to estimate your GPU's carbon emissions">
+  <meta property="twitter:image" content="https://raw.githubusercontent.com/mlco2/impact/master/img/thumbnail.png">
+
+
+  <title>ML CO2 Impact</title>
+
+  <!-- Custom styles for this template -->
+  <link rel="apple-touch-icon" sizes="180x180"
+    href="https://raw.githubusercontent.com/mlco2/impact/master/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="48x48"
+    href="https://raw.githubusercontent.com/mlco2/impact/master/img/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32"
+    href="https://raw.githubusercontent.com/mlco2/impact/master/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16"
+    href="https://raw.githubusercontent.com/mlco2/impact/master/img/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+
+
+</head>
+
+<body id="page-top">
+  <span id="home" style="display: hidden"></span>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
+    <div class="container">
+      <a class="navbar-brand js-scroll-trigger" href="#home">ML CO2 Impact</a>
+      <button type="button" class="navbar-toggler navbar-toggler-right" data-toggle="collapse"
+        data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false"
+        aria-label="Toggle navigation">
+        Menu
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a id="compute-nav-link" class="nav-link js-scroll-trigger" href="#compute">Compute</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+<!-- Home Section -->
+<header class="home-section">
+    <div id="home-container" class="container d-flex h-100 align-items-center">
+        <div class="mx-auto text-center">
+            <h1 class="mx-auto text-uppercase mb">ML CO<sub>2</sub> Impact</h1>
+            <h2 class="mx-auto mt"> Machine Learning has a carbon footprint. 
+            </h2>
+
+           
+
+            <a href="#compute" class="btn-primary btn js-scroll-trigger">Compute your ML carbon impact</a>
+        </div>
+    </div>
+</header>
+
+<!-- Compute Section -->
+<section id="compute" class="compute-section text-center">
+ 
+    
+    <div id="compute-loader">
+        <div class="spinner-border text-light" style="width: 6rem; height: 6rem;" role="status">
+        </div>
+        <div style="margin-top: 3rem" class="text-white-80">Loading Data</div>
+    </div>
+    <div id="compute-container" class="container" style="display:none">
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <h2 class="text-white mb-4 section-title">Machine Learning Emissions Calculator</h2>
+                <p class="text-white-80">Choose your hardware, runtime and cloud provider to estimate the carbon impact
+                    of your
+                    research.</p>
+
+                <p>
+                    <small>
+                        <em style="color: grey">
+                            This software was derived from the open-source <a
+                                href="https://github.com/mlco2/impact" target="_blank"
+                                rel="noopener noreferrer">ML CO2 Impact calculator </a> 
+                        </em>
+                    </small>
+                </p>
+            </div>
+
+        </div>
+
+        <form id="compute-form" novalidate>
+
+            <div class="form-row" id="compute-selects-row">
+
+                <div class="form-group col-md-4 col-lg-3 col-xl-2">
+                    <label for="compute-gpu">Hardware type</label>
+                    <select class="form-control compute-input" id="compute-gpu">
+                    </select>
+                </div>
+
+                <div class="form-group col-md-4 col-lg-2 col-xl-2">
+                    <label for="compute-hours">Hours Used</label>
+                    <input class="form-control compute-input" id="compute-hours" type="number" step="0.5" value="100" />
+                </div>
+
+                <div class="form-group col-md-4 col-lg-3 col-xl-2">
+                    <label for="compute-provider">Provider</label>
+                    <select class="form-control compute-input" id="compute-provider">
+                    </select>
+                </div>
+
+                <div class="form-group col-md-4 col-lg-3 col-xl-2" id="compute-region-div">
+                    <label for="compute-region">Region of Compute</label>
+                    <select class="form-control compute-input" id="compute-region">
+                    </select>
+                </div>
+
+                <div class="custom-hidable form-group col-md-4 col-lg-4 col-xl-3" style="display:none"
+                    id="compute-custom-impact-div">
+                    <label for="compute-custom-impact">
+                        Carbon Efficiency (<u>k</u>g/<u>k</u>Wh)
+                        <!-- Button trigger modal -->
+                        <button type="button" class="modalHelp" id="modalImpactHelp" data-toggle="modal"
+                            data-target="#impactModal">
+                            ?
+                        </button>
+                    </label>
+                    <input class="form-control compute-input" id="compute-custom-impact" type="number" step="0.5"
+                        value="0.432">
+                    </input>
+                </div>
+                <div class="custom-hidable form-group col-md-4 col-lg-4 col-xl-3" style="display:none"
+                    id="compute-custom-impact-div">
+                    <label for="compute-custom-offset">
+                        Offset bought (<u>%</u>)
+                        <!-- Button trigger modal -->
+                        <button type="button" class="modalHelp" id="modalOffsetHelp" data-toggle="modal"
+                            data-target="#offsetModal">
+                            ?
+                        </button>
+                    </label>
+                    <input class="form-control compute-input" id="compute-custom-offset" type="number" step="0.001"
+                        value="0">
+                    </input>
+                </div>
+
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <button type="submit" id="compute-submit" class="btn btn-primary">Compute</button>
+                </div>
+            </div>
+
+            <!-- Modal -->
+            <div class="modal fade" id="impactModal" tabindex="-1" role="dialog" aria-labelledby="impactModalLabel"
+                aria-hidden="true">
+			   
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+					   
+                        <!-- <div class="modal-header">
+                            <h5 class="modal-title" id="impactModalLabel">Modal title</h5>
+                        </div> -->
+                        <div class="modal-body">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <p>How carbon-intensive is the grid your infrastructure is plugged to, in <strong><u>k</u>g
+                                    CO<sub>2</sub>eq/kWh</strong></p>
+
+                            <p>Default value is the OECD's 2014 yearly average</p>
+
+                            <p>Sources we have used include:</p>
+                            <ul>
+                                <li><a href="https://www.electricitymap.org/" target="_blank"
+                                        rel="noopener noreferrer">electricitymap.org</a></li>
+                                <li><a href="https://www.carbonfootprint.com/docs/2018_8_electricity_factors_august_2018_-_online_sources.pdf"
+                                        target="_blank" rel="noopener noreferrer">Carbon Footprint's country specific
+                                        electricity factors</a></li>
+                                <li><a href="https://www.sciencedirect.com/science/article/pii/S1361920916307933	"
+                                        target="_blank" rel="noopener noreferrer">Electricity carbon intensity in
+                                        European Member States</a></li>
+                                <li><a href="https://www.epa.gov/energy/egrid-summary-tables" target="_blank"
+                                        rel="noopener noreferrer">USA's EPA's eGRID</a></li>
+                                <li>...</li>
+                                <li><a href="https://github.com/mlco2/impact/tree/master/data" target="_blank"
+                                        rel="noopener noreferrer">More sources in our data's "source" column</a></li>
+                            </ul>
+
+
+                        </div>
+                        <!-- <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary">Save changes</button>
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+            <!-- Modal -->
+            <div class="modal fade" id="offsetModal" tabindex="-1" role="dialog" aria-labelledby="impactModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <!-- <div class="modal-header">
+                            <h5 class="modal-title" id="impactModalLabel">Modal title</h5>
+                        </div> -->
+                        <div class="modal-body">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <p>How much of your infrastructure's energy consumption do you offset, <strong>in %</strong>
+                            </p>
+
+                            <p>Default value is 0</p>
+
+                        </div>
+                        <!-- <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary">Save changes</button>
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+        <div class="spinner-border text-light" style="width: 3rem; height: 3rem;display:none;" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+
+        <div class="row" id="result-row" >
+
+            <div style="display:none;" id="result-card" class="col-md-12 col-12" >
+
+                <!-- main card -->
+               
+                <div class="row">
+                    
+                    <div class="col-md-12 result-box" id="result-emitted">
+                        <div id="compute-carbon-emitted-title" class="result-title small text-uppercase text-black-50">
+                            Carbon Emitted </div>
+                        <div id="emitted-value" class="result-value"></div>
+                    </div>
+                   
+                    <div class="col-md-12 small text-black-50" id="result-unit"> kg CO<sub>2</sub> eq. <a href="#co2eq"
+                            class="js-scroll-trigger"><i class="fas fa-question-circle"></i></a></div>
+                </div>
+
+                <!-- details -->
+
+                <div id="result-details" class="details-hidden" >
+                    <div id="details-content" class="small text-black-50">
+                        <div style="padding-top: 15px;">Power consumption x Time x Carbon Produced Based on the Local
+                            Power Grid:
+                        </div>
+                        <div id="details-counts"></div>
+                        <div id="details-separator"></div>
+                        <div id="details-alternative"></div>
+						
+                        <div id="details-min-selected"> 
+						
+						
+						
+						
+						
+							
+                            <div id="details-min-region"></div>
+                           
+                        </div>
+				
+						<div style="overflow:auto;height:900px;">
+						<br>
+						<h3 style="color:red">TEC Report</h3>
+		             	    
+		             	<i class="fa fa-download" aria-hidden="true"></i> <a href="#" onclick="downloadProvenanceTrace('provenance_trace')"> Download trace (.ttl)</a>
+		             	 <br><br>
+ 
+						  <div id="accordion">
+						      <div class="card">
+                               <div class="card-header" >
+                                  <a href="#collapse8" class="accordion-button collapsed" type="button" data-toggle="collapse"  aria-expanded="false" aria-controls="#collapseTwo"> Data Transformations </a>
+                               </div> 
+                                 <div id="collapse8" class="collapse show" aria-labelledby="heading8" data-bs-parent="#accordion">
+                                    <div class="card-body">
+                                    
+                                    <table  class="table table-striped">
+                                   <thead>
+    <tr>
+						  <td>Activity</td><td>Input</td><td>Output</td>
+						  </tr>
+                                   </thead>
+                                   <tbody id="data_transformations_table_body">
+   
+                                   </tbody>
+                                   </table> 
+                                </div>
+                              </div>
+                          
+ </div>
+						 
+						  <div class="card" >
+                               <div class="card-header"  >
+                                    <a href="#collapse9" class="accordion-button collapsed" type="button" data-toggle="collapse"  aria-expanded="false" aria-controls="#collapseTwo"> Conversion Factor </a>
+                               </div> 
+                                 <div id="collapse9" class="collapse " aria-labelledby="heading9" data-bs-parent="#accordion" >
+                                    <div class="card-body" >
+						  <strong>Relevant Conversion Factors (Green row indicates the conversion factor used in this calculation)</strong>
+						  <div >
+						  <table class="table table-bordered" style="table-layout:fixed;width:100%; ">
+						  <thead>
+						  <tr>
+						  <th class="col-1">Source Unit</th><th>Target Unit</th><th>Applicable Period Start</th><th>Applicable Period End</th><th>Applicable Location</th><th>CF Value</th><th>CF IRI</th><th>Source</th><th>Emission Score <span id="score_value"></span></th>
+						  </tr>
+						  </thead>
+						  <tbody  id="cf_table_body">
+						  </tbody>
+						  
+						  </table>
+						  </div>
+						  <!--
+						<strong>Alternative Conversion Factor</strong>
+						  <div >
+						  <table class="table table-bordered" style="table-layout:fixed;width:100%; ">
+						  <thead>
+						  <tr>
+						  <th>Id</th><th>Applicable Location</th><th>Source Unit</th><th>Target Unit</th><th>Applicable Period Start</th><th>Applicable Period End</th><th>Value</th><th>Source</th>
+						  </tr>
+						  </thead>
+						  <tbody  id="cf_table_body_alternative">
+						  </tbody>
+						  
+						  </table>
+						  </div>
+						  <div id="alternative_text"></div>
+						  -->
+						  
+						</div>
+                      </div>
+                      <div id="cfDetails"> </div>
+		
+					</div>
+					
+					<div id="accordion">
+						      <div class="card">
+                               <div class="card-header" >
+                                  <a href="#collapse7" class="accordion-button collapsed" type="button" data-toggle="collapse"  aria-expanded="false" aria-controls="#collapseTwo"> Validation Checks </a>
+                               </div> 
+                                 <div id="collapse7" class="collapse " aria-labelledby="heading7" data-bs-parent="#accordion">
+                                    <div class="card-body">   
+						<div id="provTraceEval" class="alert alert-warning" role="alert"> </div>
+						   </div>
+                              </div>
+                          
+ </div>
+					
+					</div>		
+							<!--
+							<h4>Provenance Graph</h4>
+							<div id="eo-provenance"></div>
+						    <div class="container">
+						          <div id="graph"></div>
+						        </div>-->
+						
+						</div>
+                    </div>
+                    <div id="details-banner" title="Learn more about these numbers">
+                        <a class="arrow-icon open" title="Learn more about these numbers">
+                            <span class="left-bar"></span>
+                            <span class="right-bar"></span>
+                        </a>
+                    </div>
+					
+                </div>
+
+
+            </div>
+        </div>
+
+        <div class="row" id="comparison-row" style="display: none;">
+            <div id="comparison-card">
+                <h3 class="pad"><span id="comparison-result-co2">0</span> kg of CO<sub>2</sub>eq. is equivalent to:</h3>
+                <div class="row" id="comparison-columns-row">
+                    <div class="comparison-column col-xs-6 col-md-4">
+                        <div class="row"
+                            style="width: 100%; display: flex; justify-content: center; align-items: center;">
+                            <div class="col-4">
+                                <div class="comparison-result-item" id="comparison-result-driven">3.4</div>
+                            </div>
+                            <div class="col-8">
+                                <h4> Km driven by an average ICE car
+                                    <small>
+                                        <sup>[1]</sup>
+                                    </small>
+                                </h4>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- <span class="separator"></span> -->
+                    <div class="comparison-column col-xs-6 col-md-4"
+                        style="border-left: 1px solid rgb(245, 82, 73); border-right: 1px solid rgb(245, 82, 73);">
+                        <div class="row"
+                            style="width: 100%; display: flex; justify-content: center; align-items: center;">
+                            <div class="col-4">
+                                <div class="comparison-result-item" id="comparison-result-coal">3.4</div>
+                            </div>
+                            <div class="col-8">
+                                <h4> Kgs of coal burned
+                                    <small>
+                                        <sup>[2]</sup>
+                                    </small>
+                                </h4>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- <span class="separator"></span> -->
+                    <div class="comparison-column col-xs-6 col-md-4">
+                        <div class="row"
+                            style="width: 100%; display: flex; justify-content: center; align-items: center;">
+                            <div class="col-4">
+                                <div class="comparison-result-item" id="comparison-result-forest">3.4</div>
+                            </div>
+                            <div class="col-8">
+                                <h4> Tree seedlings sequesting carbon for 10 years
+                                    <small>
+                                        <sup>[3]</sup>
+                                    </small>
+                                </h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <a href="https://www.epa.gov/energy/greenhouse-gases-equivalencies-calculator-calculations-and-references"
+                        target="_blank" rel="noopener noreferrer">Source: Greenhouse Gases Equivalencies Calculator -
+                        Calculations and References</a> :
+                    <a href="https://www.epa.gov/energy/greenhouse-gases-equivalencies-calculator-calculations-and-references#miles"
+                        target="_blank" rel="noreferrer noopener"> [1] </a>
+                    <a href="https://www.epa.gov/energy/greenhouse-gases-equivalencies-calculator-calculations-and-references#lbscoal"
+                        target="_blank" rel="noreferrer noopener"> [2] </a>
+                    <a href="https://www.epa.gov/energy/greenhouse-gases-equivalencies-calculator-calculations-and-references#seedlings"
+                        target="_blank" rel="noreferrer noopener"> [3] </a>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+
+
+
+
+
+
+
+
+
+<!-- Footer -->
+<footer class="small text-center text-white-80">
+    
+</footer>
+<!--
+-----------------
+-----  CSS  -----
+-----------------
+-->
+<link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+
+<link
+    href="https://fonts.googleapis.com/css?family=Open+Sans:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+    rel="stylesheet">
+<link href="css/prism.css" rel="stylesheet">
+<link href="css/provenance-graph.css" rel="stylesheet">
+<link href="css/grayscale.min.css" rel="stylesheet">
+<!-- <link href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.min.css"
+    rel="stylesheet" /> -->
+
+<!--
+    ------------------------
+    -----  JavaScript  -----
+    ------------------------
+-->
+
+<script src="vendor/jquery/jquery.min.js"></script>
+<script src="js/jquery-csv.min.js"></script>
+<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/lozad/dist/lozad.min.js"></script>
+<script src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script>
+
+<script src="js/prism.min.js"></script>
+<script charset="UTF-8"
+    src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/components/prism-latex.min.js"></script>
+
+<script async defer crossorigin="anonymous"
+    src="https://connect.facebook.net/fr_FR/sdk.js#xfbml=1&version=v5.0"></script>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-88678459-2"></script>
+<script type="text/javascript"
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDtCCcK-9uoW6kPLo67YoKyoTOZvg14Zkw&libraries=places"></script>
+
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js"></script> -->
+
+<script src="js/data.js"></script>
+<script src="js/grayscale.js"></script>
+<script src="js/tec-context.js"></script>
+<script src="js/tec-lib.js"></script>
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+<script src="js/jsonld-vis.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.6.5/d3-tip.js"></script>
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+
+<!-- <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-88678459-2');
+
+    var input = document.getElementById('compute-custom-impact');
+    var autocomplete = new google.maps.places.Autocomplete(input, { types: ['(cities)'] });
+    google.maps.event.addListener(autocomplete, 'place_changed', function () {
+        var place = autocomplete.getPlace();
+        console.log(place);
+    })
+</script> -->
+
+</script>
+<div id="fb-root"></div>
+</body>
+
+</html>

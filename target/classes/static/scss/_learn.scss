@@ -1,0 +1,73 @@
+.learn-section {
+    background: linear-gradient(to bottom, $back-25 0, $back-1 75%, $back-15 100%),
+        url('https://raw.githubusercontent.com/mlco2/impact/master/img/lake.jpeg');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: scroll;
+    background-size: cover;
+    padding: $sectionPaddingTop 0;
+
+    text-align: center;
+
+    @media(max-width: 768px) {
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+    }
+
+    h4 {
+        max-width: 30%;
+        min-width: 30%;
+
+        @media(max-width: 768px) {
+            max-width: 75%;
+            min-width: 75%;
+        }
+    }
+
+    .details-summary {
+        display: flex;
+        cursor: pointer;
+        align-items: center;
+    }
+
+    .summary-content {
+        height: 0px;
+        overflow: hidden;
+        transition: all 600ms $inOutExpo;
+    }
+
+
+    .arrow-learn-even {
+        margin: 1.5em 0 0 2em;
+        position: relative;
+    }
+
+    .arrow-learn-odd {
+        margin: 1.5em 2em 0 0em;
+        position: relative;
+    }
+
+    .featured-text {
+        padding: 2rem;
+
+        @media (min-width: 992px) {
+            padding: 0 0 0 2rem;
+            border-left: 0.5rem solid $primary;
+        }
+    }
+
+    .learn-text {
+        padding: 2rem;
+        // font-size: 90%;
+
+        @media (min-width: 992px) {
+            padding: 3rem;
+
+            hr {
+                border-color: $primary;
+                border-width: .25rem;
+                width: calc(30% + 5em);
+            }
+        }
+    }
+}
