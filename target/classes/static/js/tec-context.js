@@ -22,11 +22,11 @@ context.startedAtTime = {"@id":prov_prefix+"startedAtTime","@type": "http://www.
 context.wasAssociatedWith = {"@id":prov_prefix+"wasAssociatedWith","@type": "@id"};
 context.wasMemberOf = {"@id":prov_prefix+"wasMemberOf","@type": "@id"}
 context.wasGeneratedBy = {"@id":prov_prefix+"wasGeneratedBy","@type": "@id"}
-context.wasDerivedFrom = {"@id":prov_prefix+"wasDerivedFrom","@type": "@id"}
+context.wasDerivedFrom = {"@id":prov_prefix+"wasDerivedFrom"}
 context.used = {"@id":prov_prefix+"used","@type": "@id"}
 context.Agent = prov_prefix+"Agent";
 context.Activity = prov_prefix+"Activity";
-context.Entity = prov_prefix+"Activity";
+context.Entity = prov_prefix+"Entity";
 
 //Qudt
 context.Quantity = qudt_prefix+"Quantity";

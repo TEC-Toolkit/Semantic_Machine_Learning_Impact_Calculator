@@ -52,7 +52,8 @@ public class SPARQLQueries {
 
 		model.read(new ByteArrayInputStream(payload.getBytes()), null, "JSON-LD");
 		System.out.println("Prov trace model size: " + model.size());
-		model.add(semModel);
+		System.out.println(payload);
+		//model.add(semModel);
 
 		try {
 			reader = new InputStreamReader(queriesFile.getInputStream());
@@ -117,6 +118,7 @@ public class SPARQLQueries {
 		Query query = QueryFactory.create(Constants.PREFIXES
 				+"Construct {\n" + 
 				"    ?id ?p ?o.\n" + 
+				
 				"    ?o2 ?p3 ?o3.\n" + 
 				"    ?o3 ?p4 ?o4.\n" + 
 				"}\n" + 
@@ -167,20 +169,20 @@ public class SPARQLQueries {
 		ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
 
 		Query query = QueryFactory.create(Constants.PREFIXES
-				+ "  SELECT DISTINCT  ?id ?sourceUnit ?targetUnit ?source ?value ?applicableLocation ?applicablePeriodStart ?applicablePeriodEnd \n" + 
+				+ "  SELECT DISTINCT  ?id ?sourceUnit ?targetUnit ?source ?value ?applicableLocation ?applicablePeriodStart ?applicablePeriodEnd ?emissionTargetSymbol\n" + 
 				"WHERE\n" + 
 			
 				"      { ?id  rdf:type  ecfo:EmissionConversionFactor .\n" + 
 				"        ?id ecfo:hasTargetUnit ?targetUnitInst.\n" + 
-				"            ?targetUnitInst    rdfs:label \"kilogram\"\n" + 
+				"            ?targetUnitInst    rdfs:label \"kilogram\".\n" + 
+				"            ?id    ecfo:hasEmissionTarget/rdfs:label ?emissionTargetSymbol " + 
 				"          { ?id ecfo:hasApplicableLocation/rdfs:label \""+region+"\" }\n" + 
 				"        UNION\n" + 
 				"        { \n" + 
 				"            ?id (ecfo:hasApplicableLocation/geo:ehContains)/rdfs:label \""+region+"\" .\n" + 
 				"            ?id  ecfo:hasScope ecfo:Scope2.\n" + 
 				"            ?id ecfo:hasEmissionSource <https://w3id.org/ecfkg/i/Electricity_generated_Electricity_UK>. \n" + 
-				"             ?id ecfo:hasTargetUnit ?targetUnitInst.\n" + 
-				"             ?targetUnitInst    rdfs:label \"kilogram\".\n" + 
+
 				"            ?id ecfo:hasEmissionTarget <http://www.wikidata.org/entity/Q1933140>.         \n" + 
 				"          }\n" + 
 				"         OPTIONAL\n" + 
@@ -198,23 +200,22 @@ public class SPARQLQueries {
 				"          { ?id  prov:wasDerivedFrom  ?source }\n" + 
 				"        OPTIONAL\n" + 
 				"          { ?id  rdf:value  ?value }\n" + 
-				"        OPTIONAL\n" + 
-				"          { ?location  rdfs:label  ?locationLabel }\n" + 
+			
 			
 				
 				"       OPTIONAL\n" + 
 				"          {\n" + 
-				"       ?location  rdfs:label  ?wikilocationLabel\n" + 
-				"            FILTER ( lang(?wikilocationLabel) = \"en\" )\n" + 
+				"       ?location  rdfs:label  ?applicableLocation\n" + 
+		
 				"        }   \n" + 
 				"        Optional {\n" + 
 				"             ?targetUnitInst  qudt:symbol  ?targetUnit.\n" + 
 				"        }\n" + 
 				"        Optional {\n" + 
 				"             ?sourceUnitInst  qudt:symbol  ?sourceUnit.\n" + 
-		 
 				"      }\n" + 
-				"    BIND(if(bound(?locationLabel), ?locationLabel, ?wikilocationLabel) AS ?applicableLocation)\n" + 
+				"            FILTER ( lang(?emissionTargetSymbol) = \"en\" )\n" + 
+			
 				"  }\n" + 
 				"ORDER BY DESC(?applicablePeriodEnd)");
 
@@ -263,7 +264,7 @@ public class SPARQLQueries {
 				"                qudt:value            ?inputValue ;\n" + 
 				"                qudt:hasQuantityKind  ?inputQuantityKind ;\n" + 
 				"                qudt:unit             ?inputUnit.\n" + 
-				"            ?inputUnit  rdfs:label  ?inputUnitLabel.  \n" + 
+				"            ?inputUnit  qudt:symbol  ?inputUnitLabel.  \n" + 
 				"            ?inputQuantityKind rdfs:label  ?inputQuantityKindL.\n" + 
 				"             FILTER ( lang(?inputUnitLabel) = \"en\" )\n" + 
 				"          }\n" + 

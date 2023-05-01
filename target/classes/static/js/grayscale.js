@@ -279,8 +279,17 @@ const setDetails = (values) => {
 				
 				console.log (CF_info_ld);
 				//add cf details
+				if (CF_info_ld['@graph']) {
 				graphLD = graphLD.concat(CF_info_ld['@graph'])
-
+				}
+				//sometimes "@graph" is not part of the response 
+				else {
+					delete CF_info_ld['@context'];
+					
+					graphLD.push(CF_info_ld);
+					
+				}
+               
 			fetch('/evaluateTrace', {
 				method: 'POST',
 				mode: "cors", // no-cors, *cors, same-origin
@@ -294,20 +303,49 @@ const setDetails = (values) => {
 				.then((response) =>
 					response.json()
 				)
-				.then((data) => {
-
-					console.log(data["CF-Out-Of-Date-Violation"])
-					console.log(data["CF-Out-Of-Date-Violation"].length)
+				.then((data) => {					
+					
+					let defaultString = '<div class="alert alert-success" role="alert">No constraints violations were detected</div>'
+					
+					let resultString = ""; 
+					
 					if (data["CF-Out-Of-Date-Violation"].length > 0) {
-						let resultString = ""
-
+						
 						for (i = 0; i < data["CF-Out-Of-Date-Violation"].length; i++) {
-							resultString = resultString + "Out of Date: The latest Emission conversion factor with value " + removeLiteralType(data["CF-Out-Of-Date-Violation"][i].cf_value) + " was valid until  " + removeLiteralType(data["CF-Out-Of-Date-Violation"][i].time) + "<br>"
+							resultString = resultString + '<div class="alert alert-warning" role="alert">Out of Date: The latest Emission conversion factor with value ' + removeLiteralType(data["CF-Out-Of-Date-Violation"][i].cf_value) + ' was valid until  ' + removeLiteralType(data["CF-Out-Of-Date-Violation"][i].time) +' </div>'
 						}
-						document.getElementById('provTraceEval').innerHTML = resultString
+						
+					}
+					
+					if (data["CF-No-Source-Violation"].length > 0) {
+
+						for (i = 0; i < data["CF-No-Source-Violation"].length; i++) {
+							resultString = resultString + '<div class="alert alert-warning" role="alert">No Source: The Emission conversion factor with value ' + removeLiteralType(data["CF-No-Source-Violation"][i].cf_value) + ' has an unknown source </div>'
+						}
+						
+					}
+					
+					if (data["CF-No-ApplicablePeriod-Start-Violation"].length > 0) {
+
+						for (i = 0; i < data["CF-No-ApplicablePeriod-Start-Violation"].length; i++) {
+							resultString = resultString + '<div class="alert alert-warning" role="alert">No Start: The Emission conversion factor with value ' + removeLiteralType(data["CF-No-ApplicablePeriod-Start-Violation"][i].cf_value) + ' has an unknown start of the applicable period </div>'
+						}
+						
+					}
+					
+					if (data["CF-No-ApplicablePeriod-End-Violation"].length > 0) {
+
+						for (i = 0; i < data["CF-No-ApplicablePeriod-End-Violation"].length; i++) {
+							resultString = resultString + '<div class="alert alert-warning" role="alert">No End: The Emission conversion factor with value ' + removeLiteralType(data["CF-No-ApplicablePeriod-End-Violation"][i].cf_value) + ' has an unknown end of the applicable period </div>'
+						}
+						
+					}
+					
+					if (resultString.length ==0) {
+						document.getElementById('provTraceEval').innerHTML = defaultString
 					}
 					else {
-						document.getElementById('provTraceEval').innerHTML = "No constraints violations were detected"
+					document.getElementById('provTraceEval').innerHTML = resultString
 					}
 				}
 				)
@@ -345,10 +383,10 @@ const setDetails = (values) => {
 					for (var prop in list) {
 						for (i = 0; i < data.length; i++) {
 							if (data[i].activityLabel == prop) {
-								let input = data[i].inputLabel + " <br> " + removeLiteralType(data[i].inputValue) + " (" + removeLiteralType(data[i].inputUnitLabel) + "), [ " + removeLiteralType(data[i].inputQuantityKindL) + "]<hr>"
+								let input = data[i].inputLabel + " - " + removeLiteralType(data[i].inputValue) + "" + removeLiteralType(data[i].inputUnitLabel) + " [" + removeLiteralType(data[i].inputQuantityKindL) + "]<hr>"
 								list[prop]["input"].push(input);
 
-								let output = data[i].outputLabel + "<br> " + removeLiteralType(data[i].outputValue) + ", (" + removeLiteralType(data[i].outputUnitLabel) + "), [ " + removeLiteralType(data[i].outputQuantityKindL) + "]<hr>"
+								let output = data[i].outputLabel + " - " + removeLiteralType(data[i].outputValue) + "" + removeLiteralType(data[i].outputUnitLabel) + " [" + removeLiteralType(data[i].outputQuantityKindL) + "]<hr>"
 								if (!list[prop]["output"].includes(output)) {
 
 									list[prop]["output"].push(output);
@@ -401,7 +439,7 @@ const setDetails = (values) => {
 			//Print CF table
 
 
-			document.getElementById('score_value').innerHTML = "<br>" + energy + " (kWh)"
+			//document.getElementById('score_value').innerHTML = "<br> for " + energy + "kWh"
 
 
 			let html_string = "";
@@ -427,9 +465,14 @@ const setDetails = (values) => {
 
 
                 html_string = html_string + "<td><a href=\"" + CF_data[i].id + "\">link</a></td>"
-				html_string = html_string + "<td><a href=\"" + CF_data[i].source + "\">link</a></td>"
 				
-				html_string = html_string + "<td>" + twoDigits(energy * twoDigits(CF_data[i].value.split("^")[0])) + "(" + CF_data[i].targetUnit + ")</td>"
+				if (CF_data[i].source) {
+				html_string = html_string + "<td><a href=\"" + CF_data[i].source + "\">link</a></td>"
+				} else {
+					html_string = html_string + "<td>no value</td>"
+				}
+				
+				html_string = html_string + "<td>" + twoDigits(energy * twoDigits(CF_data[i].value.split("^")[0])) + "" + CF_data[i].targetUnit + " ["+removeLiteralType(CF_data[i].emissionTargetSymbol)+"]</td>"
 				html_string = html_string + "</tr>"
 
 
