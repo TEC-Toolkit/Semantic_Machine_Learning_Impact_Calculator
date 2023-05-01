@@ -495,7 +495,7 @@ const setDetails = (values) => {
 			
 			fillComparisonTable(co2);
 
-			//$("#comparison-result-co2").text(co2);
+			$("#comparison-result-co2").text(co2);
 			
 			$("#details-counts").html(`
   ${state.gpus[gpu].watt}W x ${hours}h = <strong>${energy} kWh</strong> x ${impact}
