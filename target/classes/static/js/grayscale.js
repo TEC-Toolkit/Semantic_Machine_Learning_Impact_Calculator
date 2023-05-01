@@ -620,6 +620,9 @@ const setRegions = provider => {
 			const { regionName, region } = reg;
 			$("#compute-region").append(`<option value="${region}">${regionName}</option>`)
 		}
+		//set region for the demo
+		 let element = document.getElementById("compute-region");
+         element.value = "europe-west2";
 	}
 }
 
