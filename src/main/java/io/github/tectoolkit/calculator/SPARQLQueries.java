@@ -209,12 +209,12 @@ public class SPARQLQueries {
 		
 				"        }   \n" + 
 				"        Optional {\n" + 
-				"             ?targetUnitInst  qudt:symbol  ?targetUnit.\n" + 
+				"             ?targetUnitInst  qudt:abbreviation  ?targetUnit.\n" + 
 				"        }\n" + 
 				"        Optional {\n" + 
-				"             ?sourceUnitInst  qudt:symbol  ?sourceUnit.\n" + 
+				"             ?sourceUnitInst  qudt:abbreviation  ?sourceUnit.\n" + 
 				"      }\n" + 
-				"            FILTER ( lang(?emissionTargetSymbol) = \"en\" )\n" + 
+
 			
 				"  }\n" + 
 				"ORDER BY DESC(?applicablePeriodEnd)");
@@ -264,7 +264,7 @@ public class SPARQLQueries {
 				"                qudt:value            ?inputValue ;\n" + 
 				"                qudt:hasQuantityKind  ?inputQuantityKind ;\n" + 
 				"                qudt:unit             ?inputUnit.\n" + 
-				"            ?inputUnit  qudt:symbol  ?inputUnitLabel.  \n" + 
+				"            ?inputUnit  qudt:abbreviation  ?inputUnitLabel.  \n" + 
 				"            ?inputQuantityKind rdfs:label  ?inputQuantityKindL.\n" + 
 				"             FILTER ( lang(?inputUnitLabel) = \"en\" )\n" + 
 				"          }\n" + 
@@ -286,7 +286,7 @@ public class SPARQLQueries {
 				"             qudt:hasQuantityKind  ?outputQuantityKind ;\n" + 
 				"             qudt:unit             ?outputUnit\n" + 
 				"    OPTIONAL\n" + 
-				"          { ?outputUnit  qudt:symbol  ?outputUnitLabel\n" + 
+				"          { ?outputUnit  qudt:abbreviation  ?outputUnitLabel\n" + 
 				"            FILTER ( lang(?outputUnitLabel) = \"en\" )\n" + 
 				"          }\n" + 
 				"        OPTIONAL\n" + 

@@ -472,7 +472,7 @@ const setDetails = (values) => {
 					html_string = html_string + "<td>no value</td>"
 				}
 				
-				html_string = html_string + "<td>" + twoDigits(energy * twoDigits(CF_data[i].value.split("^")[0])) + "" + CF_data[i].targetUnit + " ["+removeLiteralType(CF_data[i].emissionTargetSymbol)+"]</td>"
+				html_string = html_string + "<td>" + twoDigits(energy * twoDigits(CF_data[i].value.split("^")[0])) + "" + removeLiteralType(CF_data[i].targetUnit) + " ["+removeLiteralType(CF_data[i].emissionTargetSymbol)+"]</td>"
 				html_string = html_string + "</tr>"
 
 
