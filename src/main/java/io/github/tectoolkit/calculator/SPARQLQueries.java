@@ -174,12 +174,12 @@ public class SPARQLQueries {
 			
 				"      { ?id  rdf:type  ecfo:EmissionConversionFactor .\n" + 
 				"        ?id ecfo:hasTargetUnit ?targetUnitInst.\n" + 
-				"            ?targetUnitInst    rdfs:label \"kilogram\".\n" + 
+				"            ?targetUnitInst    rdfs:label \"kilogram\"@en.\n" + 
 				"            ?id    ecfo:hasEmissionTarget/rdfs:label ?emissionTargetSymbol " + 
-				"          { ?id ecfo:hasApplicableLocation/rdfs:label \""+region+"\" }\n" + 
+				"          { ?id ecfo:hasApplicableLocation/rdfs:label \""+region+"\"@en }\n" + 
 				"        UNION\n" + 
 				"        { \n" + 
-				"            ?id (ecfo:hasApplicableLocation/geo:ehContains)/rdfs:label \""+region+"\" .\n" + 
+				"            ?id (ecfo:hasApplicableLocation/geo:ehContains)/rdfs:label \""+region+"\"@en .\n" + 
 				"            ?id  ecfo:hasScope ecfo:Scope2.\n" + 
 				"            ?id ecfo:hasEmissionSource <https://w3id.org/ecfkg/i/Electricity_generated_Electricity_UK>. \n" + 
 
@@ -292,6 +292,7 @@ public class SPARQLQueries {
 				"        OPTIONAL\n" + 
 				"          { ?outputQuantityKind\n" + 
 				"                      rdfs:label  ?outputQuantityKindL\n" + 
+				"            FILTER ( lang(?outputUnitLabel) = \"en\" )\n" + 
 				"          }\n" + 
 				"     \n" + 
 				"  } ");
