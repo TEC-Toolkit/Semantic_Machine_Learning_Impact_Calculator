@@ -3,6 +3,7 @@
 var  dataPrefix =  "https://github.com/mlco2/impact/provenance/i/";
 var  eoPrefix =  "https://w3id.org/okn/o/eo#";
 
+
 /**
  * from stack overflow https://stackoverflow.com/questions/105034/how-to-create-guid-uuid
  * @returns unique uuid
@@ -48,7 +49,7 @@ function generateJsonObject (graphLD) {
 
 
 
-function createObservation (agentIRI, observationLabel, emisisonGenerationActivityLabel, foiLabel,  graphLD) {
+function createObservation (agentIRI, observationLabel, emisisonGenerationActivityLabel, foiLabel, locationIRI,  graphLD) {
 	
 	 
 	let activity = {}; 
@@ -59,6 +60,7 @@ function createObservation (agentIRI, observationLabel, emisisonGenerationActivi
 	activity ['@type'].push (context.Activity);
 	activity ['@type'].push (context.Observation);
 	activity ['wasAssociatedWith'] =[];
+	activity ['hasFeatureOfInterest'] =[];
 	if (agentIRI!=null) {
 		activity ['wasAssociatedWith'].push (agentIRI);
 		activity ['madeBySensor'] = agentIRI;
@@ -75,9 +77,11 @@ function createObservation (agentIRI, observationLabel, emisisonGenerationActivi
 	emissionGenerationActivity ['@type'].push (context.namedIndividual);
 	emissionGenerationActivity ['@type'].push (context.Activity);
 	emissionGenerationActivity ['@type'].push (context.EmissionGenerationActivity);
+	emissionGenerationActivity['hasEmissionScore'] = []
 	if (emisisonGenerationActivityLabel!=null) {
 		emissionGenerationActivity ['label'] = emisisonGenerationActivityLabel;
 	}
+	emissionGenerationActivity ['atLocation'] = locationIRI;
 	
 	activity ['inEmissionActivityContext'] =emissionGenerationActivity ['@id'];
 	
@@ -92,6 +96,7 @@ function createObservation (agentIRI, observationLabel, emisisonGenerationActivi
 	if (foiLabel!=null) {
 		foi ['label'] = foiLabel;
 	}
+	activity ['hasFeatureOfInterest'].push(foi ['@id']);
 	
 	graphLD.push(activity);
 	graphLD.push(emissionGenerationActivity);
@@ -227,6 +232,7 @@ function createCalculationActivity (agentIRI, label, graphLD) {
 	activity ['@type'].push (context.Activity);
 	activity ['@type'].push (context.EmissionCalculationActivity);
 	if (agentIRI!=null) {
+		activity ['wasAssociatedWith'] = [];
 		activity ['wasAssociatedWith'].push (agentIRI);
 	}
 	if (label!=null) {
@@ -283,6 +289,18 @@ function linkOutputEntityToActivity (entityID,ActivityID,graphLD) {
 			else {
 				entity['wasGeneratedBy'].push( ActivityID);
 			}
+		}
+	})
+
+}
+
+
+function linkEmissionScoreToEmissionGenerationActivity (EmissionScoreID,graphLD) {
+	graphLD.forEach (function (entity) {
+		if (entity['@type'].includes(context.EmissionGenerationActivity) ) {
+			  
+				entity['hasEmissionScore'].push( EmissionScoreID);
+			
 		}
 	})
 

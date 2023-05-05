@@ -206,22 +206,26 @@ const setDetails = (values) => {
 	graphLD = [];
 
 	//record provenance of calculation --------- START
+	
+	let locationIRI = "https://w3id.org/ecfkg/i/mlco2/"+provider+"/"+region
+	
+	
 
-	let observation = createObservation("https://www.wikidata.org/entity/Q5", "Observe the duration GPU was used for", "ML model training", gpu, graphLD)
+	let observation = createObservation("https://www.wikidata.org/entity/Q5", "Observe the duration GPU was used for", "ML model training", gpu, locationIRI, graphLD)
 
 	let wattConsumption = createCalculationEntity("Watt Consumption", state.gpus[gpu].watt, "http://www.wikidata.org/entity/Q25236", "http://www.wikidata.org/entity/Q1053879", graphLD, "")
 	let durationOfUse = createObservationResult("Duration of Use", hours, "http://www.wikidata.org/entity/Q25235", "http://www.wikidata.org/entity/Q3517751", graphLD, "")
 	let energyUsed = createCalculationEntity("Energy Used", energy, "http://www.wikidata.org/entity/Q182098", "http://www.wikidata.org/entity/Q12725", graphLD, "")
 
 
-	let electricityUseEstimate = createCalculationActivity(null, "Estimate Electricity Use in kW/h", graphLD)
+	let electricityUseEstimate = createCalculationActivity("https://github.com/TEC-Toolkit/Semantic_Machine_Learning_Impact_Calculator", "Estimate Electricity Use in kW/h", graphLD)
 
 	linkResultToObservation(durationOfUse, observation, graphLD)
 	linkInputEntityToActivity(wattConsumption, electricityUseEstimate, graphLD)
 	linkInputEntityToActivity(durationOfUse, electricityUseEstimate, graphLD)
 	linkOutputEntityToActivity(energyUsed, electricityUseEstimate, graphLD)
 
-	let emissionCalculation = createCalculationActivity(null, "Emission Score Calculation", graphLD)
+	let emissionCalculation = createCalculationActivity("https://github.com/TEC-Toolkit/Semantic_Machine_Learning_Impact_Calculator", "Emission Score Calculation", graphLD)
 	linkInputEntityToActivity(energyUsed, emissionCalculation, graphLD)
 	//record provenance of calculation --------- END
 
@@ -259,7 +263,7 @@ const setDetails = (values) => {
 
 			let emissionScore = createEmissionScoreEntity("Emission Score", co2, "http://www.wikidata.org/entity/Q11570", "http://www.wikidata.org/entity/Q1933140", graphLD, "")
 			linkOutputEntityToActivity(emissionScore, emissionCalculation, graphLD)
-
+            linkEmissionScoreToEmissionGenerationActivity (emissionScore, graphLD)
 			//record provenance of calculation --------- END
 			//display provenance graph
 			console.log(graphLD);
@@ -507,6 +511,7 @@ const setDetails = (values) => {
 		)
 		.catch(function(error) {                        // catch
      alert ("The calcualtor could not retrieve the Conversion Factor data from the remote endpoint. ");
+     console.log(error)
   });
 }
 

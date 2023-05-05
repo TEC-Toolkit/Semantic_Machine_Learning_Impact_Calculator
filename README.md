@@ -4,10 +4,13 @@
 
 Thsi calculator has been derived from the code published by the <a href="https://github.com/mlco2/impact">Machine Learning's CO2 Impact</a> project
 
+## Supported Browser
+
+Google Chrome
 
 ## JAVA Version
 
-Minimum JAVA 8 is required to run this project. 
+Minimum JAVA 11 is required to run this project. 
 
 ## External Dependencies
 

@@ -27,6 +27,7 @@ context.used = {"@id":prov_prefix+"used","@type": "@id"}
 context.Agent = prov_prefix+"Agent";
 context.Activity = prov_prefix+"Activity";
 context.Entity = prov_prefix+"Entity";
+context.atLocation = {"@id":prov_prefix+"atLocation","@type": "@id"}
 
 //Qudt
 context.Quantity = qudt_prefix+"Quantity";
@@ -48,6 +49,7 @@ context.publisher = {"@id":peco_prefix+"publisher","@type": "http://www.w3.org/2
 context.applicableLocation = {"@id":peco_prefix+"applicableLocation","@type": "http://www.w3.org/2001/XMLSchema#string"};
 context.targetUnit = {"@id":peco_prefix+"scope","@type": "@id"};
 context.sourceUnit = {"@id":peco_prefix+"applicableLocation","@type": "@id"};
+context.hasEmissionScore = {"@id":peco_prefix+"hasEmissionScore","@type": "@id"};
 
 context.inEmissionActivityContext = {"@id":peco_prefix+"inEmissionActivityContext","@type": "@id"};
 

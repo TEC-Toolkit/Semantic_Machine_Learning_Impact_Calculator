@@ -272,7 +272,7 @@ public class SPARQLQueries {
 				"    UNION\n" + 
 				"     \n" + 
 				"          { ?input  rdf:value  ?inputValue .\n" + 
-				"            ?input ecfo:hasTargetUnit/qudt:symbol ?inputUnitLabel .\n" + 
+				"            ?input ecfo:hasTargetUnit/qudt:abbreviation ?inputUnitLabel .\n" + 
 				"            ?input ecfo:hasEmissionTarget/rdfs:label ?inputQuantityKindL.\n" + 
 				"            ecfo:EmissionConversionFactor rdfs:label ?inputLabel.\n" + 
 				"            FILTER ( lang(?inputQuantityKindL) = \"en\" )\n" + 
