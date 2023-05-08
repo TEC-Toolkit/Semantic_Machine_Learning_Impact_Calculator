@@ -18,7 +18,7 @@ SMLIC expands the MLIC by providing provenance information about the conversion 
 
 ## Supported Browser
 
-We have tested the Semantic Calculator in Google Chrome and Firefox
+We have tested the Semantic Calculator in Google Chrome
 
 ## JAVA Version
 

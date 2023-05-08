@@ -181,7 +181,7 @@ public class SPARQLQueries {
 				"        { \n" + 
 				"            ?id (ecfo:hasApplicableLocation/geo:ehContains)/rdfs:label \""+region+"\"@en .\n" + 
 				"            ?id  ecfo:hasScope ecfo:Scope2.\n" + 
-				"            ?id ecfo:hasEmissionSource <https://w3id.org/ecfkg/i/Electricity_generated_Electricity_UK>. \n" + 
+				"            ?id ecfo:hasTag <https://w3id.org/ecfkg/i/UK%20electricity>. \n" + 
 
 				"            ?id ecfo:hasEmissionTarget <http://www.wikidata.org/entity/Q1933140>.         \n" + 
 				"          }\n" + 
