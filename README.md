@@ -1,4 +1,6 @@
 # Semantic Machine Learning Impact Calculator (SMLIC)
+[![DOI](https://zenodo.org/badge/610785307.svg)](https://zenodo.org/badge/latestdoi/610785307)
+
 This repository includes the code and queries used to create atransparent emission calculator, together with a fully transparent emission report.
 
 **Demo:** https://calculator.linkeddata.es/
