@@ -35,7 +35,7 @@ The following online resources must be available for the app to work:
 
 ## Config
 
-Application is set to run on port 8080 by default. To change the default port edit teh port entry in  application.yml 
+Application is set to run on port 3000 by default. To change the default port edit the port entry in  application.yml 
 
 ````
 server:
