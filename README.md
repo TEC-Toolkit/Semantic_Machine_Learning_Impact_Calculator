@@ -32,13 +32,6 @@ The following online resources must be available for the app to work:
 
 - https://sparql.cf.linkeddata.es/cf (Apache Jena Fuseki)
 
-- https://query.wikidata.org/sparql
-
-- https://qudt.org/vocab/unit
-
-- https://tec-toolkit.github.io/PECO/release/0.0.1/ontology.ttl
-
-- https://tec-toolkit.github.io/ECFO/release/0.0.1/ontology.ttl
 
 ## Config
 
